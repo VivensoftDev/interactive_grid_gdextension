@@ -8,7 +8,7 @@ varying vec4 instance_c;
 
 // Using alpha as a flag due to shader limitations:
 const int CFL_WALKABLE = 1 << 0;
-const int CFL_INACCESSIBLE = 1 << 1;
+const int CFL_UNREACHABLE = 1 << 1;
 const int CFL_IN_VOID = 1 << 2;
 const int CFL_HOVERED = 1 << 3;
 const int CFL_SELECTED  = 1 << 4;
@@ -17,13 +17,13 @@ const int CFL_VISIBLE = 1 << 6;
 
 void vertex() {
     instance_c = INSTANCE_CUSTOM;
-	
+
 	int cell_flag = int(instance_c.a);
 
 	if ((cell_flag & CFL_WALKABLE) != 0) { // walkable
 		instance_c.a = 0.5;
 	}
-	
+
     // Red pulse for invalid
     if ((cell_flag & CFL_WALKABLE) == 0) { // Unwalkable
 		float float_speed = 4.0;
@@ -36,7 +36,7 @@ void vertex() {
 		instance_c.b = 0.0;
 		instance_c.a = 0.5;
 	}
-	
+
     if ((cell_flag & CFL_PATH) != 0) {
         float float_speed     = 4.0;
         float float_amplitude = 0.2;
@@ -50,7 +50,7 @@ void vertex() {
         VERTEX.y += sin(TIME * speed) * 0.2;
 		instance_c.a = 0.5;
     }
-	
+
 	if ((cell_flag & CFL_VISIBLE) == 0) {
 		instance_c.a = 0.0;
 	}

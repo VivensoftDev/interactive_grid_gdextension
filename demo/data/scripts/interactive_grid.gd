@@ -25,6 +25,7 @@ extends InteractiveGrid
 @onready var try_me: Control = $"../TryMe"
 
 var _is_grid_open: bool = false
+var _path: PackedInt64Array = []
 
 func _ready() -> void:
 	# /*F+F++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -38,18 +39,23 @@ func _process(delta: float) -> void:
 	# /*F+F++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	# Summary: Called every frame. 'delta' is the elapsed time since the previous frame.
 	#
-	# Last Modified: October 11, 2025
+	# Last Modified: November 20, 2025
 	
 	if pawn_player != null:
+			
 		# Highlight the cell under the mouse.
 		if self.get_selected_cells().is_empty():
 			self.highlight_on_hover(ray_cast_from_mouse.get_ray_intersection_position())
 		else:
-			var path: PackedInt64Array
 			var selected_cells: Array = self.get_selected_cells()
-			var index_pawn_cell: int = self.get_cell_index_from_global_position(self.get_grid_center_global_position())
-			path = self.get_path(index_pawn_cell, selected_cells[0]) # only the first one.
-			pawn_player.move_player_along_path(path)
+			var index_pawn_cell: int = self.get_cell_index_from_global_position(self.player_pawn_collision_shape_3d.global_position)
+		
+			if pawn_player._is_target_reached == true:
+				_path = []
+				_path = self.get_path(index_pawn_cell, selected_cells[0]) # only the first one.
+				pawn_player._is_target_reached = false
+			
+			pawn_player.move_player_along_path(_path)
 	# ----------------------------------------------------------------------------------------F-F*/
 
 func open_grid():
@@ -60,13 +66,13 @@ func open_grid():
 				
 				# Centers the grid.
 				# ! Info: every time center is called, the state of the cells is reset.
-				self.center(round(player_pawn_collision_shape_3d.global_position))
+				self.center(player_pawn_collision_shape_3d.global_position)
 				var index_cell_pawn: int = self.get_cell_index_from_global_position(self.get_grid_center_global_position())
 				self.hide_distant_cells(index_cell_pawn, 6)
 				
 				_is_grid_open = true
 				try_me.visible = false
-	
+
 func _input(event):
 	# /*F+F++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	# Summary: Handles mouse input events for the InteractiveGrid.

@@ -5,12 +5,12 @@ Summary: InteractiveGrid is a Godot 4.5 GDExtension that allows player
          interaction with a 3D grid, including cell selection, 
 		 pathfinding, and hover highlights.
 
-Last Modified: November 18, 2025
+Last Modified: November 20, 2025
 
 This file is part of the InteractiveGrid GDExtension Source Code.
 Repository: https://github.com/antoinecharruel/interactive_grid
 
-Version InteractiveGrid: 1.2.1
+Version InteractiveGrid: 1.3.0
 Version: Godot Engine v4.5.stable.steam - https://godotengine.org
 
 Author: Antoine Charruel
@@ -31,6 +31,11 @@ Author: Antoine Charruel
 #include <godot_cpp/classes/physics_shape_query_parameters3d.hpp>
 #include <godot_cpp/classes/shader_material.hpp>
 #include <godot_cpp/classes/world3d.hpp>
+
+#include <algorithm>
+#include <chrono>
+#include <queue>
+#include <thread>
 
 class InteractiveGrid : public godot::Node3D {
 public:
@@ -70,13 +75,10 @@ public:
 	void set_cell_mesh(const godot::Ref<godot::Mesh> &p_mesh);
 	godot::Ref<godot::Mesh> get_cell_mesh() const;
 
-	// --- Astar
+	// --- Layout
 
 	void set_movement(unsigned int value);
 	unsigned int get_movement() const;
-	void configure_astar_4_dir();
-	void configure_astar_6_dir();
-	void configure_astar_8_dir();
 
 	// --- Grid colors
 
@@ -88,9 +90,9 @@ public:
 	void set_unwalkable_color(const godot::Color &p_color);
 	godot::Color get_unwalkable_color() const;
 
-	// Color indicating that a cell is inaccessible
-	void set_inaccessible_color(const godot::Color &p_color);
-	godot::Color get_inaccessible_color() const;
+	// Color indicating that a cell is unreachable
+	void set_unreachable_color(const godot::Color &p_color);
+	godot::Color get_unreachable_color() const;
 
 	// Color of the currently selected cell
 	void set_selected_color(const godot::Color &p_color);
@@ -135,7 +137,19 @@ public:
 
 	void set_visible(bool visible);
 	bool is_visible() const;
-	void compute_inaccessible_cells(unsigned int start_cell_index);
+
+	// --- Astar
+
+	void configure_astar();
+	void configure_astar_4_dir();
+	void configure_astar_6_dir();
+	void configure_astar_8_dir();
+
+	// --- Compute
+
+	void compute_unreachable_cells(unsigned int start_cell_index);
+	void breadth_first_search(unsigned int start_cell_index);
+
 	void hide_distant_cells(unsigned int start_cell_index, float distance);
 	void set_hover_enabled(bool enabled);
 	bool is_hover_enabled() const;
@@ -149,7 +163,7 @@ public:
 
 	// Public Getters
 	bool is_cell_walkable(unsigned int cell_index) const;
-	bool is_cell_inaccesible(unsigned int cell_index) const;
+	bool is_cell_reachable(unsigned int cell_index) const;
 	bool is_cell_in_void(unsigned int cell_index) const;
 	bool is_cell_hovered(unsigned int cell_index) const;
 	bool is_cell_selected(unsigned int cell_index) const;
@@ -158,6 +172,7 @@ public:
 
 	// Public Setters
 	void set_cell_walkable(unsigned int cell_index, const bool is_walkable);
+	void set_cell_reachable(unsigned int cell_index, bool is_unreachable);
 	void set_cell_visible(unsigned int cell_index, const bool is_visible);
 
 	void reset_cells_state();
@@ -179,7 +194,16 @@ public:
 	void select_cell(godot::Vector3 global_position);
 	godot::Array get_selected_cells();
 	int get_latest_selected();
-	godot::PackedInt64Array get_path(unsigned int start_cell_index, unsigned int target_cell_index);
+	godot::PackedInt64Array get_path(unsigned int start_cell_index, unsigned int target_cell_index) const;
+	godot::PackedInt64Array get_neighbors(unsigned int cell_index) const;
+
+	// --- Debug
+
+	void set_print_logs_enabled(bool enabled);
+	bool is_print_logs_enabled() const;
+
+	void set_print_execution_time_enabled(bool enabled);
+	bool is_print_execution_time_enabled() const;
 
 protected:
 	static void _bind_methods();
@@ -187,12 +211,18 @@ protected:
 private:
 	GDCLASS(InteractiveGrid, Node3D);
 
+	struct DebugOptions {
+		bool print_logs_enabled = false;
+		bool print_execution_time_enabled = false;
+	} _debug_options;
+
 	typedef struct Cell {
 		// Cell data
 		uint16_t index = -1;
 		godot::Transform3D local_xform;
 		godot::Transform3D global_xform;
 		godot::Color color;
+		godot::PackedInt64Array neighbors{};
 		uint32_t flags = 0;
 	} Cell;
 
@@ -202,14 +232,14 @@ private:
 	static constexpr int GFL_CREATED = 1 << 1;
 	static constexpr int GFL_CENTERED = 1 << 2;
 	static constexpr int GFL_VISIBLE = 1 << 3;
-	static constexpr int GFL_CELL_INACCESSIBLE_HIDDEN = 1 << 4;
+	static constexpr int GFL_CELL_UNREACHABLE_HIDDEN = 1 << 4;
 	static constexpr int GFL_CELL_DISTANT_HIDDEN = 1 << 5;
 	static constexpr int GFL_HOVER_ENABLED = 1 << 6;
 
 	// Cell flags
 
 	static constexpr int CFL_WALKABLE = 1 << 0;
-	static constexpr int CFL_INACCESSIBLE = 1 << 1;
+	static constexpr int CFL_REACHABLE = 1 << 1;
 	static constexpr int CFL_IN_VOID = 1 << 2;
 	static constexpr int CFL_HOVERED = 1 << 3;
 	static constexpr int CFL_SELECTED = 1 << 4;
@@ -244,8 +274,6 @@ private:
 
 	// --- Cell state
 
-	// Private Setters
-	void set_cell_inaccesible(unsigned int cell_index, bool is_inaccesible);
 	void set_cell_in_void(unsigned int cell_index, bool is_in_void);
 	void set_cell_hovered(unsigned int cell_index, bool is_hovered);
 	void set_cell_selected(unsigned int cell_index, bool is_selected);
@@ -286,7 +314,7 @@ private:
 
 	godot::Color _walkable_color{ godot::Color(0.5, 0.65, 1.0, 1) }; // BLUE
 	godot::Color _unwalkable_color{ godot::Color(0.8039216, 0.36078432, 0.36078432, 1.0) }; // INDIAN_RED
-	godot::Color _inaccessible_color{ godot::Color(1.0, 1.0, 1.0, 1.0) }; // #ffffff00
+	godot::Color _unreachable_color{ godot::Color(1.0, 1.0, 1.0, 1.0) }; // #ffffff00
 	godot::Color _selected_color{ godot::Color(0.8784314, 1.0, 1.0, 1.0) }; // LIGHT_CYAN
 	godot::Color _path_color{ godot::Color(0.5647059, 0.93333334, 0.5647059, 1) };
 	godot::Color _hovered_color{ godot::Color(1.0, 0.84313726, 0, 1.0) };

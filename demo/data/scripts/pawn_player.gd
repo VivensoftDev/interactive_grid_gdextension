@@ -5,12 +5,12 @@
 #
 # Node: PlayerPawn (CharacterBody3D).
 #
-# Last modified: October 11, 2025
+# Last modified: November 20, 2025
 #
 # This file is part of the InteractiveGrid GDExtension Source Code.
 # Repository: https://github.com/antoinecharruel/interactive_grid_gdextension
 #
-# Version InteractiveGrid: 1.1.0
+# Version InteractiveGrid: 1.2.2
 # Version: Godot Engine v4.5.stable.steam - https://godotengine.org
 #
 # Author: Antoine Charruel
@@ -26,9 +26,10 @@ extends CharacterBody3D
 
 const _SPEED:float = 5.0
 const _JUMP_VELOCITY:float = 4.5
-const _DISTANCE_THRESHOLD:float = 0.1
+const _DISTANCE_THRESHOLD:float = 0.25
 
 var _nb_cell_traveled:int = 0
+var _is_target_reached:bool = false;
 
 # Enumerations containing the diferente states of the player.
 enum _pawn_movements_states{
@@ -146,7 +147,7 @@ func target_reached()-> void:
 	#          Stops the player, resets traveled cells, recenters the grid, and updates
 	#          the grid.
 	#
-	# Last Modified: October 21, 2025
+	# Last Modified: November 20, 2025
 	
 	self.velocity = Vector3.ZERO
 	set_how_many_cells_traveled(0)
@@ -156,15 +157,18 @@ func target_reached()-> void:
 		# Recenter and reset the grid.
 		interactive_grid.center(self.player_pawn_collision_shape_3d.global_position)
 		
-		var index_cell_pawn: int = interactive_grid.get_cell_index_from_global_position(self.player_pawn_collision_shape_3d.global_position)
-		
+		var index_pawn_cell: int = interactive_grid.get_cell_index_from_global_position(self.player_pawn_collision_shape_3d.global_position)
+
 		# To prevent the player from getting stuck.
-		interactive_grid.set_cell_walkable(index_cell_pawn, true)
+		interactive_grid.set_cell_walkable(index_pawn_cell, true)
+		interactive_grid.set_cell_reachable(index_pawn_cell, true)
 		
-		interactive_grid.hide_distant_cells(index_cell_pawn, 6)
-		interactive_grid.compute_inaccessible_cells(index_cell_pawn)
+		interactive_grid.hide_distant_cells(index_pawn_cell, 6)
+		interactive_grid.compute_unreachable_cells(index_pawn_cell)
+				
+		interactive_grid.set_cell_color(index_pawn_cell, Color(0.6, 0.8, 0.18, 1))
 		
-		interactive_grid.set_cell_color(index_cell_pawn, Color(0.6, 0.8, 0.18, 1))
+		_is_target_reached = true
 	# ----------------------------------------------------------------------------------------F-F*/
 	
 func is_on_target_cell()-> bool:

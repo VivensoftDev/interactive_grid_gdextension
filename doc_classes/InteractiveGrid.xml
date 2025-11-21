@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="InteractiveGrid" inherits="Node3D" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
 	<brief_description>
-		InteractiveGrid is a Godot 4.5 GDExtension that allows player interaction with a 3D grid, including cell selection, pathfinding, and hover highlights.
+		InteractiveGrid is a Godot GDExtension that allows player interaction with a 3D grid, including cell selection, pathfinding, and hover highlights.
 	</brief_description>
 	<description>
 		— Highlight cells when hovering the mouse over them.
@@ -24,14 +24,15 @@
 				Called to re-center the grid. This also resets the grid state.
 			</description>
 		</method>
-		<method name="compute_inaccessible_cells">
+		<method name="compute_unreachable_cells">
 			<return type="void" />
 			<param index="0" name="start_cell_index" type="int" />
 			<description>
-				Iterates over all grid cells and marks as inaccessible those cells that cannot be reached from the specified start cell. Updates the visual representation of inaccessible cells by applying the _inaccessible_color to the grid's multimesh.
-				Note:
-				— Inaccessible cells are not marked as unwalkable.
-				— Current implementation iterates through all cells and calculates paths for each, which can be slow for large grids.
+			Iterates over all grid cells and marks as unreachable those cells that
+			cannot be reached from the specified start cell. Updates the visual
+			representation by applying `_unreachable_color` to the grid's MultiMesh.
+			Unreachable cells are not marked as unwalkable to allow gameplay features
+			such as teleportation.
 			</description>
 		</method>
 		<method name="get_cell_golbal_position" qualifiers="const">
@@ -60,7 +61,14 @@
 				Returns the most recently selected cell.
 			</description>
 		</method>
-		<method name="get_path">
+		<method name="get_neighbors" qualifiers="const">
+			<return type="PackedInt64Array" />
+			<param index="0" name="cell_index" type="int" />
+			<description>
+			Returns the indices of neighboring cells for the specified grid cell.
+			</description>
+		</method>
+		<method name="get_path" qualifiers="const">
 			<return type="PackedInt64Array" />
 			<param index="0" name="start_cell_index" type="int" />
 			<param index="1" name="target_cell_index" type="int" />
@@ -103,11 +111,11 @@
 				Returns true if the cell at the specified index is currently marked as hovered.
 			</description>
 		</method>
-		<method name="is_cell_inaccesible" qualifiers="const">
+		<method name="is_cell_reachable" qualifiers="const">
 			<return type="bool" />
 			<param index="0" name="cell_index" type="int" />
 			<description>
-				Returns true if the cell at the specified index is currently marked as inaccesible.
+			Returns true if the cell at the specified index is currently marked as unreachable.
 			</description>
 		</method>
 		<method name="is_cell_selected" qualifiers="const">
@@ -170,12 +178,12 @@
 				Sets the color of a specific cell in the interactive grid.
 			</description>
 		</method>
-		<method name="set_cell_inaccesible">
+		<method name="set_cell_reachable">
 			<return type="void" />
 			<param index="0" name="cell_index" type="int" />
-			<param index="1" name="set_cell_inaccesible" type="bool" />
+			<param index="1" name="set_cell_reachable" type="bool" />
 			<description>
-				Sets whether a given grid cell (cell_index) is inaccessible.
+			Sets whether a given grid cell is unreachable.
 			</description>
 		</method>
 		<method name="set_cell_walkable">
@@ -216,9 +224,7 @@
 		</member>
 		<member name="floor_collision_masks" type="int" setter="set_grid_floor_collision_masks" getter="get_grid_floor_collision_masks" default="16384">
 		</member>
-		<member name="hovered color" type="Color" setter="set_hovered_color" getter="get_hovered_color" default="Color(1, 0.84313726, 0, 255)">
-		</member>
-		<member name="inaccessible color" type="Color" setter="set_inaccessible_color" getter="get_inaccessible_color" default="Color(1, 1, 1, 255)">
+		<member name="hovered color" type="Color" setter="set_hovered_color" getter="get_hovered_color" default="Color(1, 0.84313726, 0, 1)">
 		</member>
 		<member name="layout" type="int" setter="set_layout" getter="get_layout" default="0">
 		</member>
@@ -226,13 +232,19 @@
 		</member>
 		<member name="obstacles_collision_masks" type="int" setter="set_obstacles_collision_masks" getter="get_obstacles_collision_masks" default="8192">
 		</member>
-		<member name="path color" type="Color" setter="set_path_color" getter="get_path_color" default="Color(0.5647059, 0.93333334, 0.5647059, 255)">
+		<member name="path color" type="Color" setter="set_path_color" getter="get_path_color" default="Color(0.5647059, 0.93333334, 0.5647059, 1)">
 		</member>
-		<member name="selected color" type="Color" setter="set_selected_color" getter="get_selected_color" default="Color(0.8784314, 1, 1, 255)">
+		<member name="print_execution_time" type="bool" setter="set_print_execution_time_enabled" getter="is_print_execution_time_enabled" default="false">
 		</member>
-		<member name="unwalkable color" type="Color" setter="set_unwalkable_color" getter="get_unwalkable_color" default="Color(0.8039216, 0.36078432, 0.36078432, 0.94509804)">
+		<member name="print_logs_enabled" type="bool" setter="set_print_logs_enabled" getter="is_print_logs_enabled" default="false">
 		</member>
-		<member name="walkable color" type="Color" setter="set_walkable_color" getter="get_walkable_color" default="Color(0.9411765, 1, 0.9411765, 0.3137255)">
+		<member name="selected color" type="Color" setter="set_selected_color" getter="get_selected_color" default="Color(0.8784314, 1, 1, 1)">
+		</member>
+		<member name="unreachable color" type="Color" setter="set_unreachable_color" getter="get_unreachable_color" default="Color(1, 1, 1, 1)">
+		</member>
+		<member name="unwalkable color" type="Color" setter="set_unwalkable_color" getter="get_unwalkable_color" default="Color(0.8039216, 0.36078432, 0.36078432, 1)">
+		</member>
+		<member name="walkable color" type="Color" setter="set_walkable_color" getter="get_walkable_color" default="Color(0.5, 0.65, 1, 1)">
 		</member>
 	</members>
 </class>

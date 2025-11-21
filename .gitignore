@@ -3,7 +3,6 @@
 .godot/
 
 # Keep addons and their binaries
-addons/*
 !addons/
 !addons/**/*.gdextension
 !addons/**/*.so
@@ -11,7 +10,6 @@ addons/*
 !addons/**/*.dylib
 !addons/**/*.gitkeep
 
-demo/addons/*
 !demo/addons/
 !demo/addons/**/*.gdextension
 !demo/addons/**/*.so

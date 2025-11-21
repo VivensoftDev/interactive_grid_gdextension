@@ -6,8 +6,6 @@
 [ext_resource type="PackedScene" uid="uid://dbna5exmjhbhp" path="res://data/scenes/pawn_player.tscn" id="5_dxyxo"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_yeeyf"]
-top_radius = 0.577
-bottom_radius = 0.577
 height = 0.1
 radial_segments = 6
 
@@ -32,6 +30,8 @@ enable_alpha_pass = true
 _material_override = SubResource("ShaderMaterial_pbhab")
 layout = 1
 movement = 1
+print_logs_enabled = true
+print_execution_time = true
 script = ExtResource("4_w868w")
 
 [node name="TryMe" parent="." instance=ExtResource("4_2qaj2")]
