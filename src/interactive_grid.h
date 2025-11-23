@@ -5,12 +5,12 @@ Summary: InteractiveGrid is a Godot 4.5 GDExtension that allows player
          interaction with a 3D grid, including cell selection, 
 		 pathfinding, and hover highlights.
 
-Last Modified: November 20, 2025
+Last Modified: November 23, 2025
 
 This file is part of the InteractiveGrid GDExtension Source Code.
 Repository: https://github.com/antoinecharruel/interactive_grid
 
-Version InteractiveGrid: 1.3.0
+Version InteractiveGrid: 1.4.0
 Version: Godot Engine v4.5.stable.steam - https://godotengine.org
 
 Author: Antoine Charruel
@@ -23,6 +23,7 @@ Author: Antoine Charruel
 // Godot engine
 #include <godot_cpp/classes/a_star2d.hpp>
 #include <godot_cpp/classes/box_shape3d.hpp>
+#include <godot_cpp/classes/engine.hpp>
 #include <godot_cpp/classes/mesh_instance3d.hpp>
 #include <godot_cpp/classes/multi_mesh.hpp>
 #include <godot_cpp/classes/multi_mesh_instance3d.hpp>
@@ -31,6 +32,7 @@ Author: Antoine Charruel
 #include <godot_cpp/classes/physics_shape_query_parameters3d.hpp>
 #include <godot_cpp/classes/shader_material.hpp>
 #include <godot_cpp/classes/world3d.hpp>
+#include <godot_cpp/core/class_db.hpp>
 
 #include <algorithm>
 #include <chrono>
@@ -247,6 +249,7 @@ private:
 	static constexpr int CFL_VISIBLE = 1 << 6;
 
 	void create();
+	void destroy();
 
 	// --- Grid initialization
 
@@ -285,16 +288,16 @@ private:
 
 	// --- Grid
 
-	unsigned int _rows{ 9 }; // ROWS
-	unsigned int _columns{ 9 }; // COLUMNS
-	uint32_t _flags = 0; // FLAGS
+	unsigned int _rows{ 9 };
+	unsigned int _columns{ 9 };
+	uint32_t _flags = 0;
 
 	godot::Vector3 _grid_center_position = godot::Vector3(0.0f, 0.0f, 0.0f);
 	godot::Vector3 _grid_offset = godot::Vector3(0.0f, 0.0f, 0.0f);
 	godot::Ref<godot::AStar2D> _astar;
 
-	unsigned int _layout{ 0 }; // SQUARE = 0, HEXAGONAL = 1
-	unsigned int _movement{ 0 }; // ORTHOGONAL = 0, DIAGONAL = 1
+	unsigned int _layout{ 0 };
+	unsigned int _movement{ 0 };
 	unsigned int _obstacles_collision_masks{ 1 << 13 }; // mask 14 = pow(2,13) = 1 << 13 = 8192
 	unsigned int _floor_collision_masks{ 1 << 14 }; // mask 15 = pow(2,14) = 1 << 14 = 16384
 
@@ -310,7 +313,7 @@ private:
 
 	bool is_cell_index_out_of_bounds(const godot::String &file, const godot::String &func, int line, unsigned int cell_index);
 
-	// --- colors
+	// --- Colors
 
 	godot::Color _walkable_color{ godot::Color(0.5, 0.65, 1.0, 1) }; // BLUE
 	godot::Color _unwalkable_color{ godot::Color(0.8039216, 0.36078432, 0.36078432, 1.0) }; // INDIAN_RED
@@ -319,7 +322,7 @@ private:
 	godot::Color _path_color{ godot::Color(0.5647059, 0.93333334, 0.5647059, 1) };
 	godot::Color _hovered_color{ godot::Color(1.0, 0.84313726, 0, 1.0) };
 
-	// --- material
+	// --- Material
 
 	godot::Ref<godot::Material> _material_override;
 

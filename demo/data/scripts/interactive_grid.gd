@@ -42,7 +42,7 @@ func _process(delta: float) -> void:
 	# Last Modified: November 20, 2025
 	
 	if pawn_player != null:
-			
+		
 		# Highlight the cell under the mouse.
 		if self.get_selected_cells().is_empty():
 			self.highlight_on_hover(ray_cast_from_mouse.get_ray_intersection_position())

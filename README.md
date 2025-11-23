@@ -1,4 +1,4 @@
-[![Interactive Grid GDExtension Godot Asset Library page](https://img.shields.io/static/v1?logo=godotengine&label=Interactive%20Grid%20GDExtension&color=478CBF&message=1.3.0)](https://godotengine.org/asset-library/asset/4372)
+[![Interactive Grid GDExtension Godot Asset Library page](https://img.shields.io/static/v1?logo=godotengine&label=Interactive%20Grid%20GDExtension&color=478CBF&message=1.4.0)](https://godotengine.org/asset-library/asset/4372)
 [![Patreon](https://img.shields.io/badge/Patreon-Vivensoft-F96854?logo=patreon&logoColor=white)](https://www.patreon.com/c/vivensoft/)  
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-AntoineCharruel-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/antoinecharruel)
 [![AntoineCharruel on Itch.io](https://img.shields.io/badge/Itch.io-AntoineCharruel-FF5E5B?logo=itch.io&logoColor=white)](https://antoine-charruel.itch.io/)
@@ -11,7 +11,7 @@
 
 ![Grid Showcase](/docs/thumbnail/thumbnail.png)
 
-InteractiveGrid is a Godot 4.5 GDExtension that allows player interaction with a 3D grid, including cell selection, pathfinding, and hover highlights.
+InteractiveGrid is a Godot GDExtension that allows player interaction with a 3D grid, including cell selection, pathfinding, and hover highlights.
 
 ## Features
 
@@ -51,12 +51,12 @@ InteractiveGrid is a Godot 4.5 GDExtension that allows player interaction with a
 #
 # Node: InteractiveGrid (InteractiveGrid).
 #
-# Last modified: October 25, 2025
+# Last modified: November 23, 2025
 #
 # This file is part of the InteractiveGrid GDExtension Source Code.
 # Repository: https://github.com/antoinecharruel/interactive_grid_gdextension
 #
-# Version InteractiveGrid: 1.1.1
+# Version InteractiveGrid: 1.4.0
 # Version: Godot Engine v4.5.stable.steam - https://godotengine.org
 #
 # Author: Antoine Charruel
@@ -102,7 +102,7 @@ func _input(event):
 				
  				# Hides distant cells.
 				self.hide_distant_cells(index_cell_pawn, 6)	
-				self.compute_inaccessible_cells(index_cell_pawn)
+				self.compute_unreachable_cells(index_cell_pawn)
 				
 				# Manually set cell color.
 				# var color_cell = Color(0.3, 0.4, 0.9)
@@ -149,7 +149,6 @@ func _input(event):
 
 ```python
 // dynamic.gdshader
-// https://rgbcolorpicker.com/0-1
 
 shader_type spatial;
 render_mode unshaded, cull_disabled, depth_draw_opaque;
@@ -158,7 +157,7 @@ varying vec4 instance_c;
 
 // Using alpha as a flag due to shader limitations:
 const int CFL_WALKABLE = 1 << 0;
-const int CFL_INACCESSIBLE = 1 << 1;
+const int CFL_REACHABLE = 1 << 1;
 const int CFL_IN_VOID = 1 << 2;
 const int CFL_HOVERED = 1 << 3;
 const int CFL_SELECTED  = 1 << 4;
@@ -167,15 +166,16 @@ const int CFL_VISIBLE = 1 << 6;
 
 void vertex() {
     instance_c = INSTANCE_CUSTOM;
-	
+
 	int cell_flag = int(instance_c.a);
+
 
 	if ((cell_flag & CFL_WALKABLE) != 0) { // walkable
 		instance_c.a = 0.5;
 	}
-	
+
     // Red pulse for invalid
-    if ((cell_flag & CFL_WALKABLE) == 0) { // Unwalkable
+    if ((cell_flag & CFL_WALKABLE) == 0) { // unwalkable
 		float float_speed = 4.0;
 		float color_min = 0.3;
 		float color_max = 0.8;
@@ -186,7 +186,15 @@ void vertex() {
 		instance_c.b = 0.0;
 		instance_c.a = 0.5;
 	}
-	
+
+	if ((cell_flag & CFL_REACHABLE) == 0) { // unreachable
+		instance_c.a = 0.0;
+	}
+
+	if ((cell_flag & CFL_VISIBLE) == 0) {
+		instance_c.a = 0.0;
+	}
+
     if ((cell_flag & CFL_PATH) != 0) {
         float float_speed     = 4.0;
         float float_amplitude = 0.2;
@@ -200,7 +208,7 @@ void vertex() {
         VERTEX.y += sin(TIME * speed) * 0.2;
 		instance_c.a = 0.5;
     }
-	
+
 	if ((cell_flag & CFL_VISIBLE) == 0) {
 		instance_c.a = 0.0;
 	}

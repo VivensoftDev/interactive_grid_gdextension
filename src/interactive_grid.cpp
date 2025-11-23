@@ -5,12 +5,12 @@ Summary: InteractiveGrid is a Godot 4.5 GDExtension that allows player
          interaction with a 3D grid, including cell selection,
 		 pathfinding, and hover highlights.
 
-Last Modified: November 20, 2025
+Last Modified: November 23, 2025
 
 This file is part of the InteractiveGrid GDExtension Source Code.
 Repository: https://github.com/antoinecharruel/interactive_grid
 
-Version InteractiveGrid: 1.3.0
+Version InteractiveGrid: 1.4.0
 Version: Godot Engine v4.5.stable.steam - https://godotengine.org
 
 Author: Antoine Charruel
@@ -20,7 +20,9 @@ Author: Antoine Charruel
 
 InteractiveGrid::InteractiveGrid() {}
 
-InteractiveGrid::~InteractiveGrid() {}
+InteractiveGrid::~InteractiveGrid() {
+	destroy();
+}
 
 void InteractiveGrid::_ready(void) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
@@ -35,18 +37,25 @@ void InteractiveGrid::_physics_process(double p_delta) {
   Summary: Called every frame. 'delta' is the elapsed time since the 
            previous frame.
 
-  Last Modified: May 03, 2025
+  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	create(); // Create the grid at startup
+
+	if (godot::Engine::get_singleton()->is_editor_hint()) {
+		if (_grid_center_position != get_global_transform().origin) {
+			destroy();
+		}
+	}
 }
 
 void InteractiveGrid::set_rows(const unsigned int rows) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the number of rows in the grid.
 
-  Last Modified: April 29, 2025
+  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	_rows = rows;
+	destroy();
 }
 
 int InteractiveGrid::get_rows(void) const {
@@ -62,9 +71,10 @@ void InteractiveGrid::set_columns(const unsigned int columns) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the number of columns in the grid.
 
-  Last Modified: April 29, 2025
+  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	_columns = columns;
+	destroy();
 }
 
 int InteractiveGrid::get_columns(void) const {
@@ -101,9 +111,10 @@ void InteractiveGrid::set_cell_mesh(const godot::Ref<godot::Mesh> &p_mesh) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the mesh used for each cell of the grid.
 
-  Last Modified: May 03, 2025
+  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	_cell_mesh = p_mesh;
+	destroy();
 }
 
 godot::Ref<godot::Mesh> InteractiveGrid::get_cell_mesh() const {
@@ -138,9 +149,10 @@ void InteractiveGrid::set_walkable_color(const godot::Color &p_color) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the walkable color for the grid.
 
-  Last Modified: April 30, 2025
+  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	_walkable_color = p_color;
+	destroy();
 }
 
 godot::Color InteractiveGrid::get_walkable_color() const {
@@ -156,9 +168,10 @@ void InteractiveGrid::set_unwalkable_color(const godot::Color &p_color) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the unwalkable color for the grid.
 
-  Last Modified: April 30, 2025
+  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	_unwalkable_color = p_color;
+	destroy();
 }
 
 godot::Color InteractiveGrid::get_unwalkable_color() const {
@@ -268,9 +281,10 @@ void InteractiveGrid::set_material_override(const godot::Ref<godot::Material> &p
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the material override for the grid.
 
-  Last Modified: April 30, 2025
+  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	_material_override = p_material;
+	destroy();
 }
 
 godot::Ref<godot::Material> InteractiveGrid::get_material_override() const {
@@ -549,8 +563,14 @@ void InteractiveGrid::center(godot::Vector3 center_position) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Called to re-center the grid. This also resets the grid state.
 
-  Last Modified: November 21, 2025
+  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+
+	if (!(_flags & GFL_CREATED)) {
+		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid has not been created");
+		return; // !Exit
+	}
+
 	auto start = std::chrono::high_resolution_clock::now();
 
 	_flags &= ~GFL_CENTERED; // Reset
@@ -582,9 +602,10 @@ void InteractiveGrid::set_layout(unsigned int value) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	Summary: Sets the grid layout.
 
-	Last Modified: October 05, 2025
+  	Last Modified: November 23, 2025
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	_layout = value;
+	destroy();
 }
 
 unsigned int InteractiveGrid::get_layout() const {
@@ -633,8 +654,12 @@ void InteractiveGrid::configure_astar() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	Summary: // TODO
 
-	Last Modified: Novenber 21, 2025
+	Last Modified: November 23, 2025
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+	if (godot::Engine::get_singleton()->is_editor_hint()) {
+		return; // ! Exit
+	}
+
 	auto start = std::chrono::high_resolution_clock::now();
 
 	_astar->clear();
@@ -1115,8 +1140,13 @@ void InteractiveGrid::InteractiveGrid::reset_cells_state() {
   Summary: Resets the state of all cells in the grid to their default 
            flags.
 
-  Last Modified: November 20, 2025
+  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+
+	if (!(_flags & GFL_CREATED)) {
+		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid has not been created");
+		return; // !Exit
+	}
 
 	// Iterate through the cells
 	for (int row = 0; row < _rows; row++) {
@@ -1469,16 +1499,49 @@ void InteractiveGrid::create() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Initializes the grid if it has not been created yet.
 
-  Last Modified: September 19, 2025
+  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (!(_flags & GFL_CREATED)) {
+		_grid_center_position = get_global_transform().origin;
+
 		init_multi_mesh();
 		init_astar();
-		layout(godot::Vector3(0, 0, 0));
 
-		_flags |= GFL_CREATED; // Mark as created to avoid duplication.
+		_flags |= GFL_CREATED; // Mark as created to avoid duplication
 
-		set_visible(false);
+		center(_grid_center_position);
+
+		if (godot::Engine::get_singleton()->is_editor_hint()) {
+			set_visible(true);
+		} else {
+			set_visible(false);
+		}
+	}
+}
+
+void InteractiveGrid::destroy() {
+	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+  Summary: Frees all grid resources and resets state.
+
+  Last Modified: November 23, 2025
+  M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+	if (_flags & GFL_CREATED) {
+		// Destroy cells
+		for (Cell *c : _cells) {
+			delete c;
+		}
+		_cells.clear();
+
+		// Destroy multimesh
+		if (_multimesh_instance) {
+			_multimesh_instance->queue_free();
+			_multimesh_instance = nullptr;
+		}
+
+		// Reset AStar2D
+		_astar = godot::Ref<godot::AStar2D>();
+
+		_flags &= ~GFL_CREATED;
 	}
 }
 
@@ -1558,8 +1621,14 @@ void InteractiveGrid::layout(godot::Vector3 center_position) {
   Summary: Positions the cells around the center according to the 
            selected layout.
 
-  Last Modified: October 07, 2025
+  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+
+	if (!(_flags & GFL_CREATED)) {
+		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid has not been created");
+		return; // !Exit
+	}
+
 	switch (_layout) {
 		case LAYOUT::SQUARE:
 			layout_cells_as_square_grid(center_position);
@@ -1714,8 +1783,9 @@ void InteractiveGrid::align_cells_with_floor() {
   		Align Player with Ground! [Video]. YouTube.
 		https://www.youtube.com/watch?v=Y5OiChOukfg
 
-  Last Modified: November 21, 2025
+  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+
 	if (_flags & GFL_CREATED) {
 		auto start = std::chrono::high_resolution_clock::now();
 
@@ -1834,8 +1904,14 @@ void InteractiveGrid::align_cells_with_floor() {
 
 					// Optional debug:
 					// godot::print_line("New transformation of the cell: ", xform);
-				} else {
+				} else if (!godot::Engine::get_singleton()->is_editor_hint()) {
+					// In game
 					set_cell_in_void(index, true);
+				} else {
+					// In editor
+					set_cell_walkable(index, true);
+					set_cell_reachable(index, true);
+					set_cell_visible(index, true);
 				}
 			}
 		}
