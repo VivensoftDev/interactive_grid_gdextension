@@ -41,6 +41,129 @@ Author: Antoine Charruel
 #include <thread>
 
 class InteractiveGrid : public godot::Node3D {
+private:
+	GDCLASS(InteractiveGrid, Node3D);
+
+	struct DebugOptions {
+		bool print_logs_enabled = false;
+		bool print_execution_time_enabled = false;
+	} _debug_options;
+
+	typedef struct Cell {
+		// Cell data
+		uint16_t index = -1;
+		godot::Transform3D local_xform;
+		godot::Transform3D global_xform;
+		godot::Color color;
+		godot::PackedInt64Array neighbors{};
+		uint32_t flags = 0;
+	} Cell;
+
+	// Grid flags
+
+	static constexpr int GFL_DEBUG = 1 << 0;
+	static constexpr int GFL_CREATED = 1 << 1;
+	static constexpr int GFL_CENTERED = 1 << 2;
+	static constexpr int GFL_VISIBLE = 1 << 3;
+	static constexpr int GFL_CELL_UNREACHABLE_HIDDEN = 1 << 4;
+	static constexpr int GFL_CELL_DISTANT_HIDDEN = 1 << 5;
+	static constexpr int GFL_HOVER_ENABLED = 1 << 6;
+
+	// Cell flags
+
+	static constexpr int CFL_WALKABLE = 1 << 0;
+	static constexpr int CFL_REACHABLE = 1 << 1;
+	static constexpr int CFL_IN_VOID = 1 << 2;
+	static constexpr int CFL_HOVERED = 1 << 3;
+	static constexpr int CFL_SELECTED = 1 << 4;
+	static constexpr int CFL_PATH = 1 << 5;
+	static constexpr int CFL_VISIBLE = 1 << 6;
+
+	void create();
+	void destroy();
+
+	// --- Grid initialization
+
+	void init_multi_mesh();
+	void init_astar();
+
+	// --- Grid position
+
+	void align_cells_with_floor();
+	void scan_environnement_obstacles();
+
+	// --- Grid layout
+
+	void layout(godot::Vector3 center_position);
+	void layout_cells_as_square_grid(godot::Vector3 center_position);
+	void layout_cells_as_hexagonal_grid(godot::Vector3 center_position);
+
+	// --- Grid materials
+
+	void apply_material(const godot::Ref<godot::Material> &p_material);
+
+	// --- Grid visibility
+
+	void set_cells_visible(bool visible);
+
+	// --- Cell state
+
+	void set_cell_in_void(unsigned int cell_index, bool is_in_void);
+	void set_cell_hovered(unsigned int cell_index, bool is_hovered);
+	void set_cell_selected(unsigned int cell_index, bool is_selected);
+	void set_cell_on_path(unsigned int cell_index, bool is_on_path);
+
+	/*--------------------------------------------------------------------
+    Grid data members
+  --------------------------------------------------------------------*/
+
+	// --- Grid
+
+	unsigned int _rows{ 9 };
+	unsigned int _columns{ 9 };
+	uint32_t _flags = 0;
+
+	godot::Vector3 _grid_center_position = godot::Vector3(0.0f, 0.0f, 0.0f);
+	godot::Vector3 _grid_offset = godot::Vector3(0.0f, 0.0f, 0.0f);
+	godot::Ref<godot::AStar2D> _astar;
+
+	unsigned int _layout{ 0 };
+	unsigned int _movement{ 0 };
+	unsigned int _obstacles_collision_masks{ 1 << 13 }; // mask 14 = pow(2,13) = 1 << 13 = 8192
+	unsigned int _floor_collision_masks{ 1 << 14 }; // mask 15 = pow(2,14) = 1 << 14 = 16384
+
+	// --- Cells
+
+	godot::Ref<godot::Mesh> _cell_mesh;
+	godot::MultiMeshInstance3D *_multimesh_instance;
+	godot::Ref<godot::MultiMesh> _multimesh;
+	godot::Vector2 _cell_size = godot::Vector2(1.0f, 1.0f);
+	std::vector<Cell *> _cells;
+	godot::Array _selected_cells;
+	int _hovered_cell_index{ -1 };
+
+	// --- Colors
+
+	godot::Color _walkable_color{ godot::Color(0.5, 0.65, 1.0, 1) }; // BLUE
+	godot::Color _unwalkable_color{ godot::Color(0.8039216, 0.36078432, 0.36078432, 1.0) }; // INDIAN_RED
+	godot::Color _unreachable_color{ godot::Color(1.0, 1.0, 1.0, 1.0) }; // #ffffff00
+	godot::Color _selected_color{ godot::Color(0.8784314, 1.0, 1.0, 1.0) }; // LIGHT_CYAN
+	godot::Color _path_color{ godot::Color(0.5647059, 0.93333334, 0.5647059, 1) };
+	godot::Color _hovered_color{ godot::Color(1.0, 0.84313726, 0, 1.0) };
+
+	// --- Material
+
+	godot::Ref<godot::Material> _material_override;
+
+	// --- Scan environnement
+
+	godot::Ref<godot::BoxShape3D> _obstacle_shape;
+
+	bool _alpha_pass{ false };
+
+protected:
+	static void _bind_methods();
+
 public:
 	enum LAYOUT {
 		SQUARE = 0,
@@ -208,128 +331,5 @@ public:
 	void set_print_execution_time_enabled(bool enabled);
 	bool is_print_execution_time_enabled() const;
 
-protected:
-	static void _bind_methods();
-
-private:
-	GDCLASS(InteractiveGrid, Node3D);
-
-	struct DebugOptions {
-		bool print_logs_enabled = false;
-		bool print_execution_time_enabled = false;
-	} _debug_options;
-
-	typedef struct Cell {
-		// Cell data
-		uint16_t index = -1;
-		godot::Transform3D local_xform;
-		godot::Transform3D global_xform;
-		godot::Color color;
-		godot::PackedInt64Array neighbors{};
-		uint32_t flags = 0;
-	} Cell;
-
-	// Grid flags
-
-	static constexpr int GFL_DEBUG = 1 << 0;
-	static constexpr int GFL_CREATED = 1 << 1;
-	static constexpr int GFL_CENTERED = 1 << 2;
-	static constexpr int GFL_VISIBLE = 1 << 3;
-	static constexpr int GFL_CELL_UNREACHABLE_HIDDEN = 1 << 4;
-	static constexpr int GFL_CELL_DISTANT_HIDDEN = 1 << 5;
-	static constexpr int GFL_HOVER_ENABLED = 1 << 6;
-
-	// Cell flags
-
-	static constexpr int CFL_WALKABLE = 1 << 0;
-	static constexpr int CFL_REACHABLE = 1 << 1;
-	static constexpr int CFL_IN_VOID = 1 << 2;
-	static constexpr int CFL_HOVERED = 1 << 3;
-	static constexpr int CFL_SELECTED = 1 << 4;
-	static constexpr int CFL_PATH = 1 << 5;
-	static constexpr int CFL_VISIBLE = 1 << 6;
-
-	void create();
-	void destroy();
-
-	// --- Grid initialization
-
-	void init_multi_mesh();
-	void init_astar();
-
-	// --- Grid position
-
-	void align_cells_with_floor();
-	void scan_environnement_obstacles();
-
-	// --- Grid layout
-
-	void layout(godot::Vector3 center_position);
-	void layout_cells_as_square_grid(godot::Vector3 center_position);
-	void layout_cells_as_hexagonal_grid(godot::Vector3 center_position);
-
-	// --- Grid materials
-
-	void apply_material(const godot::Ref<godot::Material> &p_material);
-
-	// --- Grid visibility
-
-	void set_cells_visible(bool visible);
-
-	// --- Cell state
-
-	void set_cell_in_void(unsigned int cell_index, bool is_in_void);
-	void set_cell_hovered(unsigned int cell_index, bool is_hovered);
-	void set_cell_selected(unsigned int cell_index, bool is_selected);
-	void set_cell_on_path(unsigned int cell_index, bool is_on_path);
-
-	/*--------------------------------------------------------------------
-    Grid data members
-  --------------------------------------------------------------------*/
-
-	// --- Grid
-
-	unsigned int _rows{ 9 };
-	unsigned int _columns{ 9 };
-	uint32_t _flags = 0;
-
-	godot::Vector3 _grid_center_position = godot::Vector3(0.0f, 0.0f, 0.0f);
-	godot::Vector3 _grid_offset = godot::Vector3(0.0f, 0.0f, 0.0f);
-	godot::Ref<godot::AStar2D> _astar;
-
-	unsigned int _layout{ 0 };
-	unsigned int _movement{ 0 };
-	unsigned int _obstacles_collision_masks{ 1 << 13 }; // mask 14 = pow(2,13) = 1 << 13 = 8192
-	unsigned int _floor_collision_masks{ 1 << 14 }; // mask 15 = pow(2,14) = 1 << 14 = 16384
-
-	// --- Cells
-
-	godot::Ref<godot::Mesh> _cell_mesh;
-	godot::MultiMeshInstance3D *_multimesh_instance;
-	godot::Ref<godot::MultiMesh> _multimesh;
-	godot::Vector2 _cell_size = godot::Vector2(1.0f, 1.0f);
-	std::vector<Cell *> _cells;
-	godot::Array _selected_cells;
-	int _hovered_cell_index{ -1 };
-
 	bool is_cell_index_out_of_bounds(const godot::String &file, const godot::String &func, int line, unsigned int cell_index);
-
-	// --- Colors
-
-	godot::Color _walkable_color{ godot::Color(0.5, 0.65, 1.0, 1) }; // BLUE
-	godot::Color _unwalkable_color{ godot::Color(0.8039216, 0.36078432, 0.36078432, 1.0) }; // INDIAN_RED
-	godot::Color _unreachable_color{ godot::Color(1.0, 1.0, 1.0, 1.0) }; // #ffffff00
-	godot::Color _selected_color{ godot::Color(0.8784314, 1.0, 1.0, 1.0) }; // LIGHT_CYAN
-	godot::Color _path_color{ godot::Color(0.5647059, 0.93333334, 0.5647059, 1) };
-	godot::Color _hovered_color{ godot::Color(1.0, 0.84313726, 0, 1.0) };
-
-	// --- Material
-
-	godot::Ref<godot::Material> _material_override;
-
-	// --- Scan environnement
-
-	godot::Ref<godot::BoxShape3D> _obstacle_shape;
-
-	bool _alpha_pass{ false };
 };
