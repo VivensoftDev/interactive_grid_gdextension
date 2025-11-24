@@ -33,6 +33,7 @@ Author: Antoine Charruel
 #include <godot_cpp/classes/shader_material.hpp>
 #include <godot_cpp/classes/world3d.hpp>
 #include <godot_cpp/core/class_db.hpp>
+#include <godot_cpp/templates/vector.hpp>
 
 #include <algorithm>
 #include <chrono>

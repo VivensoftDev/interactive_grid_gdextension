@@ -887,18 +887,20 @@ void InteractiveGrid::breadth_first_search(unsigned int start_cell_index) {
 	};
 
 	unsigned int grid_size = _rows * _columns;
-	std::vector<BSFNode> graph(grid_size);
+	godot::Vector<BSFNode> graph;
+	graph.resize(grid_size);
 
 	// Init nodes
 	for (int index = 0; index < grid_size; index++) {
-		graph.at(index).is_walkable = is_cell_walkable(index);
-		graph.at(index).is_reachable = is_cell_reachable(index);
-		graph.at(index).neighbors = get_neighbors(index);
+		graph.write[index].is_walkable = is_cell_walkable(index);
+		graph.write[index].is_reachable = is_cell_reachable(index);
+		graph.write[index].is_reachable = is_cell_reachable(index);
+		graph.write[index].neighbors = get_neighbors(index);
 	}
 
 	std::queue<int> q; // FIFO queue for BFS
 
-	graph[start_cell_index].visited = true;
+	graph.write[start_cell_index].visited = true;
 	q.push(start_cell_index);
 
 	// BFS loop
@@ -918,7 +920,7 @@ void InteractiveGrid::breadth_first_search(unsigned int start_cell_index) {
 
 			if (!graph[neighbor].visited) {
 				q.push(neighbor);
-				graph[neighbor].visited = true;
+				graph.write[neighbor].visited = true;
 			}
 		}
 	}
