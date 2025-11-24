@@ -1299,7 +1299,25 @@ godot::PackedInt64Array InteractiveGrid::get_path(unsigned int start_cell_index,
 
   Last Modified: October 21, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	godot::PackedInt64Array path = _astar->get_id_path(start_cell_index, target_cell_index);
+
+	godot::PackedInt64Array path;
+
+	if (!(_flags & GFL_CREATED)) {
+		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid has not been created");
+		return path; // !Exit
+	}
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	path = _astar->get_id_path(start_cell_index, target_cell_index);
+
+	auto end = std::chrono::high_resolution_clock::now();
+
+	if (_debug_options.print_execution_time_enabled) {
+		std::chrono::duration<double, std::milli> duration = end - start;
+		PrintLine(__FILE__, __FUNCTION__, __LINE__, "Execution time (ms): ", duration.count());
+	}
+
 	return path;
 }
 
