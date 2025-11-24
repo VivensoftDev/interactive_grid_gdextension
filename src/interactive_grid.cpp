@@ -24,15 +24,15 @@ void InteractiveGrid::_create() {
 
   Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	if (!(_flags & GFL_CREATED)) {
-		_grid_center_position = get_global_transform().origin;
+	if (!(data.flags & GFL_CREATED)) {
+		data.grid_center_position = get_global_transform().origin;
 
 		_init_multi_mesh();
 		_init_astar();
 
-		_flags |= GFL_CREATED; // Mark as created to avoid duplication
+		data.flags |= GFL_CREATED; // Mark as created to avoid duplication
 
-		center(_grid_center_position);
+		center(data.grid_center_position);
 
 		if (godot::Engine::get_singleton()->is_editor_hint()) {
 			set_visible(true);
@@ -48,23 +48,23 @@ void InteractiveGrid::_destroy() {
 
   Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	if (_flags & GFL_CREATED) {
+	if (data.flags & GFL_CREATED) {
 		// Destroy cells
-		for (Cell *c : _cells) {
+		for (Cell *c : data.cells) {
 			delete c;
 		}
-		_cells.clear();
+		data.cells.clear();
 
 		// Destroy multimesh
-		if (_multimesh_instance) {
-			_multimesh_instance->queue_free();
-			_multimesh_instance = nullptr;
+		if (data.multimesh_instance) {
+			data.multimesh_instance->queue_free();
+			data.multimesh_instance = nullptr;
 		}
 
 		// Reset AStar2D
-		_astar = godot::Ref<godot::AStar2D>();
+		data.astar = godot::Ref<godot::AStar2D>();
 
-		_flags &= ~GFL_CREATED;
+		data.flags &= ~GFL_CREATED;
 	}
 }
 
@@ -83,45 +83,45 @@ void InteractiveGrid::_init_multi_mesh() {
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
 	// Create the MultiMeshInstance3D
-	_multimesh_instance = memnew(godot::MultiMeshInstance3D);
-	this->add_child(_multimesh_instance);
-	_multimesh.instantiate();
+	data.multimesh_instance = memnew(godot::MultiMeshInstance3D);
+	this->add_child(data.multimesh_instance);
+	data.multimesh.instantiate();
 
-	_multimesh->set_transform_format(godot::MultiMesh::TRANSFORM_3D);
+	data.multimesh->set_transform_format(godot::MultiMesh::TRANSFORM_3D);
 
 	// Important: enable BEFORE setting instance_count
-	_multimesh->set_use_custom_data(true);
+	data.multimesh->set_use_custom_data(true);
 
-	int cell_count = _columns * _rows;
-	_multimesh->set_instance_count(cell_count);
+	int cell_count = data.columns * data.rows;
+	data.multimesh->set_instance_count(cell_count);
 
 	// Assign the MultiMesh to the instance
-	_multimesh_instance->set_multimesh(_multimesh);
-	_multimesh->set_mesh(_cell_mesh);
+	data.multimesh_instance->set_multimesh(data.multimesh);
+	data.multimesh->set_mesh(data.cell_mesh);
 
 	godot::Transform3D xform;
 	xform.origin = godot::Vector3(0, 0, 0);
 
 	// Iterate through the cells
-	for (int row = 0; row < _rows; row++) {
-		for (int column = 0; column < _columns; column++) {
+	for (int row = 0; row < data.rows; row++) {
+		for (int column = 0; column < data.columns; column++) {
 			const int index =
-					row * _columns + column; // Index in the 2D array stored as 1D
+					row * data.columns + column; // Index in the 2D array stored as 1D
 
 			// Position and color all cells
-			_multimesh->set_instance_transform(index, xform);
-			_multimesh->set_instance_custom_data(index, _walkable_color);
+			data.multimesh->set_instance_transform(index, xform);
+			data.multimesh->set_instance_custom_data(index, data.walkable_color);
 
 			// Save the metadata
-			_cells.push_back(new Cell); // Init
-			_cells.at(index)->index = index; // Init
-			_cells.at(index)->local_xform = xform; // Init
-			_cells.at(index)->global_xform = xform; // Init
+			data.cells.push_back(new Cell); // Init
+			data.cells.at(index)->index = index; // Init
+			data.cells.at(index)->local_xform = xform; // Init
+			data.cells.at(index)->global_xform = xform; // Init
 		}
 	}
 
-	_apply_material(_material_override);
-	_flags |= GFL_VISIBLE;
+	_apply_material(data.material_override);
+	data.flags |= GFL_VISIBLE;
 
 	if (_debug_options.print_logs_enabled) {
 		PrintLine(__FILE__, __FUNCTION__, __LINE__, "The grid MultiMesh has been created.");
@@ -136,7 +136,7 @@ void InteractiveGrid::_init_astar() {
 
   Last Modified: September 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_astar.instantiate(); // Create the AStar2D instance
+	data.astar.instantiate(); // Create the AStar2D instance
 }
 
 void InteractiveGrid::_layout(godot::Vector3 center_position) {
@@ -147,12 +147,12 @@ void InteractiveGrid::_layout(godot::Vector3 center_position) {
   Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-	if (!(_flags & GFL_CREATED)) {
+	if (!(data.flags & GFL_CREATED)) {
 		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid has not been created");
 		return; // !Exit
 	}
 
-	switch (_layout_index) {
+	switch (data.layout_index) {
 		case LAYOUT::SQUARE:
 			_layout_cells_as_square_grid(center_position);
 			break;
@@ -169,29 +169,29 @@ void InteractiveGrid::_layout_cells_as_square_grid(godot::Vector3 center_positio
 
   Last Modified: November 21, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_grid_center_position = center_position;
+	data.grid_center_position = center_position;
 
 	// Calculate the distances between the center and the grid's edges
-	const float pawn_to_grid_edge_x = (_columns / 2) * _cell_size.x;
-	const float pawn_to_grid_edge_z = (_rows / 2) * _cell_size.y;
+	const float pawn_to_grid_edge_x = (data.columns / 2) * data.cell_size.x;
+	const float pawn_to_grid_edge_z = (data.rows / 2) * data.cell_size.y;
 
 	//  Initialize the member `grid_offset_`
-	_grid_offset.x = center_position.x - pawn_to_grid_edge_x;
-	_grid_offset.z = center_position.z - pawn_to_grid_edge_z;
+	data.grid_offset.x = center_position.x - pawn_to_grid_edge_x;
+	data.grid_offset.z = center_position.z - pawn_to_grid_edge_z;
 
 	// Iterate through the cells
-	for (int row = 0; row < _rows; row++) {
-		for (int column = 0; column < _columns; column++) {
-			const int index = row * _columns + column; // Index in the 2D array stored as 1D
+	for (int row = 0; row < data.rows; row++) {
+		for (int column = 0; column < data.columns; column++) {
+			const int index = row * data.columns + column; // Index in the 2D array stored as 1D
 
 			// Calculate the cell's position
-			float cell_pos_x = _grid_offset.x + column * _cell_size.x;
+			float cell_pos_x = data.grid_offset.x + column * data.cell_size.x;
 			float cell_pos_y = center_position.y;
-			float cell_pos_z = _grid_offset.z + row * _cell_size.y;
+			float cell_pos_z = data.grid_offset.z + row * data.cell_size.y;
 			godot::Vector3 cell_pos(cell_pos_x, cell_pos_y, cell_pos_z);
 
 			// Apply the position (global, not local)
-			godot::Transform3D global_xform = _multimesh_instance->get_global_transform();
+			godot::Transform3D global_xform = data.multimesh_instance->get_global_transform();
 			godot::Transform3D local_xform = global_xform.affine_inverse(); // Inverse du global
 
 			// Convert the global position to local:
@@ -201,11 +201,11 @@ void InteractiveGrid::_layout_cells_as_square_grid(godot::Vector3 center_positio
 			godot::Transform3D xform;
 			xform.origin = local_pos;
 
-			_multimesh->set_instance_transform(index, xform);
+			data.multimesh->set_instance_transform(index, xform);
 
 			// Save cell's metadata
-			_cells.at(index)->local_xform = _multimesh->get_instance_transform(index);
-			_cells.at(index)->global_xform = _multimesh_instance->get_global_transform() * _multimesh->get_instance_transform(index);
+			data.cells.at(index)->local_xform = data.multimesh->get_instance_transform(index);
+			data.cells.at(index)->global_xform = data.multimesh_instance->get_global_transform() * data.multimesh->get_instance_transform(index);
 
 			set_cell_visible(index, false);
 		}
@@ -232,20 +232,20 @@ void InteractiveGrid::_layout_cells_as_hexagonal_grid(godot::Vector3 center_posi
 
   Last Modified: October 21, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_grid_center_position = center_position;
+	data.grid_center_position = center_position;
 
 	// Calculate the distances between the center and the grid's edges
-	const float pawn_to_grid_edge_x = (_columns / 2) * _cell_size.x;
-	const float pawn_to_grid_edge_z = (_rows / 2) * _cell_size.y;
+	const float pawn_to_grid_edge_x = (data.columns / 2) * data.cell_size.x;
+	const float pawn_to_grid_edge_z = (data.rows / 2) * data.cell_size.y;
 
 	//  Initialize the member `grid_offset_`
-	_grid_offset.x = center_position.x - pawn_to_grid_edge_x - _cell_size.x / 2;
-	_grid_offset.z = center_position.z - pawn_to_grid_edge_z - _cell_size.y;
+	data.grid_offset.x = center_position.x - pawn_to_grid_edge_x - data.cell_size.x / 2;
+	data.grid_offset.z = center_position.z - pawn_to_grid_edge_z - data.cell_size.y;
 
 	// Iterate through the cells
-	for (int row = 0; row < _rows; row++) {
-		for (int column = 0; column < _columns; column++) {
-			const int index = row * _columns + column; // Index in the 2D array stored as 1D
+	for (int row = 0; row < data.rows; row++) {
+		for (int column = 0; column < data.columns; column++) {
+			const int index = row * data.columns + column; // Index in the 2D array stored as 1D
 
 			// Compute columns
 			float cell_pos_x{ 0.0f };
@@ -253,21 +253,21 @@ void InteractiveGrid::_layout_cells_as_hexagonal_grid(godot::Vector3 center_posi
 			bool is_even_row = (row % 2) == 0;
 
 			if (is_even_row)
-				cell_pos_x = _grid_offset.x + column * _cell_size.x;
+				cell_pos_x = data.grid_offset.x + column * data.cell_size.x;
 			else
-				cell_pos_x = _grid_offset.x + (_cell_size.x / 2) + column * _cell_size.x;
+				cell_pos_x = data.grid_offset.x + (data.cell_size.x / 2) + column * data.cell_size.x;
 
 			// Compute height
 			float cell_pos_y = center_position.y;
 
 			// Compute rows
-			float cell_pos_z = _grid_offset.z + row * _cell_size.y + _cell_size.y * godot::Math::cos(godot::Math::deg_to_rad(30.0f));
+			float cell_pos_z = data.grid_offset.z + row * data.cell_size.y + data.cell_size.y * godot::Math::cos(godot::Math::deg_to_rad(30.0f));
 
 			// Apply final position
 			godot::Vector3 cell_pos(cell_pos_x, cell_pos_y, cell_pos_z);
 
 			// Apply the position (global, not local)
-			godot::Transform3D global_xform = _multimesh_instance->get_global_transform();
+			godot::Transform3D global_xform = data.multimesh_instance->get_global_transform();
 			godot::Transform3D local_xform = global_xform.affine_inverse(); // Inverse du global
 
 			// Convert the global position to local:
@@ -277,11 +277,11 @@ void InteractiveGrid::_layout_cells_as_hexagonal_grid(godot::Vector3 center_posi
 			godot::Transform3D xform;
 			xform.origin = local_pos;
 
-			_multimesh->set_instance_transform(index, xform);
+			data.multimesh->set_instance_transform(index, xform);
 
 			// Save cell's metadata
-			_cells.at(index)->local_xform = _multimesh->get_instance_transform(index);
-			_cells.at(index)->global_xform = _multimesh_instance->get_global_transform() * _multimesh->get_instance_transform(index);
+			data.cells.at(index)->local_xform = data.multimesh->get_instance_transform(index);
+			data.cells.at(index)->global_xform = data.multimesh_instance->get_global_transform() * data.multimesh->get_instance_transform(index);
 
 			set_cell_visible(index, false);
 		}
@@ -309,7 +309,7 @@ void InteractiveGrid::_align_cells_with_floor() {
   Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-	if (_flags & GFL_CREATED) {
+	if (data.flags & GFL_CREATED) {
 		auto start = std::chrono::high_resolution_clock::now();
 
 		// Maximum raycast length
@@ -317,27 +317,27 @@ void InteractiveGrid::_align_cells_with_floor() {
 
 		// Global transform of the MultiMeshInstance (position/rotation/scale in
 		// world space)
-		const godot::Transform3D global_transform = _multimesh_instance->get_global_transform();
+		const godot::Transform3D global_transform = data.multimesh_instance->get_global_transform();
 
 		// Affine inverse: allows converting global coordinates into the local
 		// space
 		const godot::Transform3D global_to_local = global_transform.affine_inverse();
 
 		// Iterate through the cells
-		for (int row = 0; row < _rows; row++) {
-			for (int column = 0; column < _columns; column++) {
+		for (int row = 0; row < data.rows; row++) {
+			for (int column = 0; column < data.columns; column++) {
 				const int index =
-						row * _columns + column; // Index in the 2D array stored as 1D
+						row * data.columns + column; // Index in the 2D array stored as 1D
 
 				/*--------------------------------------------------------------------
          Initialization of the starting coordinates and the ray
         --------------------------------------------------------------------*/
 
 				// Local origin of the cell (in the grid's local space)
-				godot::Vector3 local_from = _cells.at(index)->local_xform.origin;
+				godot::Vector3 local_from = data.cells.at(index)->local_xform.origin;
 
 				// Global position of the cell (in the 3D world).
-				godot::Vector3 global_from = _cells.at(index)->global_xform.origin;
+				godot::Vector3 global_from = data.cells.at(index)->global_xform.origin;
 
 				// Raises the raycast starting point to ensure it begins above the cell
 				global_from.y += 100.0f;
@@ -357,11 +357,11 @@ void InteractiveGrid::_align_cells_with_floor() {
 				ray_query->set_from(global_from); // Starting point of the ray
 				ray_query->set_to(global_to); // End point of the ray
 
-				ray_query->set_collision_mask(_floor_collision_masks);
+				ray_query->set_collision_mask(data.floor_collision_masks);
 
 				// Excludes the MultiMesh to prevent it from blocking its own ray
 				godot::TypedArray<godot::RID> exclude_array;
-				exclude_array.append(_multimesh->get_rid());
+				exclude_array.append(data.multimesh->get_rid());
 				ray_query->set_exclude(exclude_array);
 
 				// Executes the raycast and retrieves the result
@@ -415,11 +415,11 @@ void InteractiveGrid::_align_cells_with_floor() {
 					xform.basis.set_column(2, basis_z); // Corrected Z axis
 					xform.basis = xform.basis.orthonormalized(); // Orthonormalizes to prevent
 					// numerical errors.
-					_multimesh->set_instance_transform(index, xform);
+					data.multimesh->set_instance_transform(index, xform);
 
 					// Updates the instance transform in the MultiMesh
-					_cells.at(index)->local_xform = xform;
-					_cells.at(index)->global_xform = _multimesh_instance->get_global_transform() * _multimesh->get_instance_transform(index);
+					data.cells.at(index)->local_xform = xform;
+					data.cells.at(index)->global_xform = data.multimesh_instance->get_global_transform() * data.multimesh->get_instance_transform(index);
 
 					set_cell_walkable(index, true);
 					set_cell_reachable(index, true);
@@ -465,7 +465,7 @@ void InteractiveGrid::_scan_environnement_obstacles() {
 
   Last Modified: November 21, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	if (!(_flags & GFL_VISIBLE)) {
+	if (!(data.flags & GFL_VISIBLE)) {
 		return;
 	}
 
@@ -479,20 +479,20 @@ void InteractiveGrid::_scan_environnement_obstacles() {
 	}
 
 	// Prepare the shape if it has not been created yet
-	if (_obstacle_shape.is_null()) {
-		_obstacle_shape.instantiate();
-		_obstacle_shape->set_size(godot::Vector3(_cell_size.x, 1.0, _cell_size.y));
+	if (data.obstacle_shape.is_null()) {
+		data.obstacle_shape.instantiate();
+		data.obstacle_shape->set_size(godot::Vector3(data.cell_size.x, 1.0, data.cell_size.y));
 	}
 
 	auto start = std::chrono::high_resolution_clock::now();
 
 	// Iterate through the cells
-	for (int row = 0; row < _rows; row++) {
-		for (int column = 0; column < _columns; column++) {
+	for (int row = 0; row < data.rows; row++) {
+		for (int column = 0; column < data.columns; column++) {
 			// Calculates the cell index
-			const int index = row * _columns + column;
+			const int index = row * data.columns + column;
 			// Retrieves the position of the cell
-			const godot::Vector3 cell_pos = _cells.at(index)->global_xform.origin;
+			const godot::Vector3 cell_pos = data.cells.at(index)->global_xform.origin;
 
 			// Configure a physics query for collision detection
 			godot::Ref<godot::PhysicsShapeQueryParameters3D> query;
@@ -501,13 +501,13 @@ void InteractiveGrid::_scan_environnement_obstacles() {
 			query.instantiate();
 
 			// Assign the shape to be tested (here: the box shape representing a grid cell)
-			query->set_shape(_obstacle_shape);
+			query->set_shape(data.obstacle_shape);
 
 			// Place the shape in the world at the current grid cell position (no rotation applied)
 			query->set_transform(godot::Transform3D(godot::Basis(), cell_pos));
 
 			// Define which collision layers will be considered by this query
-			query->set_collision_mask(_obstacles_collision_masks);
+			query->set_collision_mask(data.obstacles_collision_masks);
 
 			// Enable collision checks with PhysicsBody3D (e.g., walls, obstacles, characters)
 			query->set_collide_with_bodies(true);
@@ -589,18 +589,18 @@ void InteractiveGrid::_apply_material(const godot::Ref<godot::Material> &p_mater
 
   Last Modified: October 05, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	if (_multimesh_instance == nullptr) {
+	if (data.multimesh_instance == nullptr) {
 		PrintError(__FILE__, __FUNCTION__, __LINE__, "No MultiMeshInstance found.");
 		return;
 	}
 
 	if (p_material.is_null()) {
 		// No material provided; clearing existing material override and applying default material
-		_multimesh_instance->set_material_override(nullptr);
+		data.multimesh_instance->set_material_override(nullptr);
 		apply_default_material();
 		return;
 	} else {
-		_multimesh_instance->set_material_override(p_material);
+		data.multimesh_instance->set_material_override(p_material);
 	}
 }
 
@@ -610,23 +610,23 @@ void InteractiveGrid::_set_cells_visible(bool visible) {
 
   Last Modified: October 09, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	int cell_count = _multimesh->get_instance_count();
+	int cell_count = data.multimesh->get_instance_count();
 
 	// Iterate through the cells
-	for (int row = 0; row < _rows; row++) {
-		for (int column = 0; column < _columns; column++) {
+	for (int row = 0; row < data.rows; row++) {
+		for (int column = 0; column < data.columns; column++) {
 			const int index =
-					row * _columns + column; // Index in the 2D array stored as 1D
+					row * data.columns + column; // Index in the 2D array stored as 1D
 
 			if (visible == true) {
-				_multimesh->set_instance_custom_data(index, _walkable_color); // Visible
+				data.multimesh->set_instance_custom_data(index, data.walkable_color); // Visible
 			} else {
-				_multimesh->set_instance_custom_data(index, godot::Color(0.0, 0.0, 0.0, 0.0)); // Invisible
+				data.multimesh->set_instance_custom_data(index, godot::Color(0.0, 0.0, 0.0, 0.0)); // Invisible
 			}
 		}
 	}
 
-	_apply_material(_material_override);
+	_apply_material(data.material_override);
 }
 
 void InteractiveGrid::_set_cell_in_void(unsigned int cell_index, bool is_in_void) {
@@ -642,10 +642,10 @@ void InteractiveGrid::_set_cell_in_void(unsigned int cell_index, bool is_in_void
 	}
 
 	if (is_in_void) {
-		_cells.at(cell_index)->flags |= CFL_IN_VOID;
+		data.cells.at(cell_index)->flags |= CFL_IN_VOID;
 		set_cell_visible(cell_index, false);
 	} else if (!is_in_void) {
-		_cells.at(cell_index)->flags &= ~CFL_IN_VOID;
+		data.cells.at(cell_index)->flags &= ~CFL_IN_VOID;
 	}
 }
 
@@ -660,10 +660,10 @@ void InteractiveGrid::_set_cell_hovered(unsigned int cell_index, bool is_hovered
 	}
 
 	if (is_hovered) {
-		_cells.at(cell_index)->flags |= CFL_HOVERED;
-		set_cell_color(_hovered_cell_index, _hovered_color);
+		data.cells.at(cell_index)->flags |= CFL_HOVERED;
+		set_cell_color(data.hovered_cell_index, data.hovered_color);
 	} else if (!is_hovered) {
-		_cells.at(cell_index)->flags &= ~CFL_HOVERED;
+		data.cells.at(cell_index)->flags &= ~CFL_HOVERED;
 	}
 }
 
@@ -679,10 +679,10 @@ void InteractiveGrid::_set_cell_selected(unsigned int cell_index, bool is_select
 	}
 
 	if (is_selected) {
-		_cells.at(cell_index)->flags |= CFL_SELECTED;
-		set_cell_color(cell_index, _selected_color);
+		data.cells.at(cell_index)->flags |= CFL_SELECTED;
+		set_cell_color(cell_index, data.selected_color);
 	} else if (!is_selected) {
-		_cells.at(cell_index)->flags &= ~CFL_SELECTED;
+		data.cells.at(cell_index)->flags &= ~CFL_SELECTED;
 	}
 }
 
@@ -698,10 +698,10 @@ void InteractiveGrid::_set_cell_on_path(unsigned int cell_index, bool is_on_path
 	}
 
 	if (is_on_path) {
-		_cells.at(cell_index)->flags |= CFL_PATH;
-		set_cell_color(cell_index, _path_color);
+		data.cells.at(cell_index)->flags |= CFL_PATH;
+		set_cell_color(cell_index, data.path_color);
 	} else if (!is_on_path) {
-		_cells.at(cell_index)->flags &= ~CFL_PATH;
+		data.cells.at(cell_index)->flags &= ~CFL_PATH;
 	}
 }
 
@@ -877,7 +877,7 @@ void InteractiveGrid::_physics_process(double p_delta) {
 	_create(); // Create the grid at startup
 
 	if (godot::Engine::get_singleton()->is_editor_hint()) {
-		if (_grid_center_position != get_global_transform().origin) {
+		if (data.grid_center_position != get_global_transform().origin) {
 			_destroy();
 		}
 	}
@@ -889,7 +889,7 @@ void InteractiveGrid::set_rows(const unsigned int rows) {
 
   Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_rows = rows;
+	data.rows = rows;
 	_destroy();
 }
 
@@ -899,7 +899,7 @@ int InteractiveGrid::get_rows(void) const {
 
   Last Modified: April 29, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _rows;
+	return data.rows;
 }
 
 void InteractiveGrid::set_columns(const unsigned int columns) {
@@ -908,7 +908,7 @@ void InteractiveGrid::set_columns(const unsigned int columns) {
 
   Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_columns = columns;
+	data.columns = columns;
 	_destroy();
 }
 
@@ -918,7 +918,7 @@ int InteractiveGrid::get_columns(void) const {
 
   Last Modified: April 29, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _columns;
+	return data.columns;
 }
 
 void InteractiveGrid::set_cell_size(const godot::Vector2 cell_size) {
@@ -928,7 +928,7 @@ void InteractiveGrid::set_cell_size(const godot::Vector2 cell_size) {
 
   Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_cell_size = cell_size;
+	data.cell_size = cell_size;
 	_destroy();
 }
 
@@ -940,7 +940,7 @@ godot::Vector2 InteractiveGrid::get_cell_size(void) const {
 
   Last Modified: May 03, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _cell_size;
+	return data.cell_size;
 }
 
 void InteractiveGrid::set_cell_mesh(const godot::Ref<godot::Mesh> &p_mesh) {
@@ -949,7 +949,7 @@ void InteractiveGrid::set_cell_mesh(const godot::Ref<godot::Mesh> &p_mesh) {
 
   Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_cell_mesh = p_mesh;
+	data.cell_mesh = p_mesh;
 	_destroy();
 }
 
@@ -959,7 +959,7 @@ godot::Ref<godot::Mesh> InteractiveGrid::get_cell_mesh() const {
 
   Last Modified: September 29, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _cell_mesh;
+	return data.cell_mesh;
 }
 
 void InteractiveGrid::set_movement(unsigned int value) {
@@ -968,7 +968,7 @@ void InteractiveGrid::set_movement(unsigned int value) {
 
   Last Modified: September 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_movement = value;
+	data.movement = value;
 }
 
 unsigned int InteractiveGrid::get_movement() const {
@@ -978,7 +978,7 @@ unsigned int InteractiveGrid::get_movement() const {
 
   Last Modified: September 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _movement;
+	return data.movement;
 }
 
 void InteractiveGrid::set_walkable_color(const godot::Color &p_color) {
@@ -987,7 +987,7 @@ void InteractiveGrid::set_walkable_color(const godot::Color &p_color) {
 
   Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_walkable_color = p_color;
+	data.walkable_color = p_color;
 	_destroy();
 }
 
@@ -997,7 +997,7 @@ godot::Color InteractiveGrid::get_walkable_color() const {
 
   Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _walkable_color;
+	return data.walkable_color;
 }
 
 void InteractiveGrid::set_unwalkable_color(const godot::Color &p_color) {
@@ -1006,7 +1006,7 @@ void InteractiveGrid::set_unwalkable_color(const godot::Color &p_color) {
 
   Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_unwalkable_color = p_color;
+	data.unwalkable_color = p_color;
 	_destroy();
 }
 
@@ -1016,7 +1016,7 @@ godot::Color InteractiveGrid::get_unwalkable_color() const {
 
   Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _unwalkable_color;
+	return data.unwalkable_color;
 }
 
 void InteractiveGrid::set_unreachable_color(const godot::Color &p_color) {
@@ -1025,7 +1025,7 @@ void InteractiveGrid::set_unreachable_color(const godot::Color &p_color) {
 
   Last Modified: November 20, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_unreachable_color = p_color;
+	data.unreachable_color = p_color;
 }
 
 godot::Color InteractiveGrid::get_unreachable_color() const {
@@ -1034,7 +1034,7 @@ godot::Color InteractiveGrid::get_unreachable_color() const {
 
   Last Modified: November 20, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _unreachable_color;
+	return data.unreachable_color;
 }
 
 void InteractiveGrid::set_selected_color(const godot::Color &p_color) {
@@ -1043,7 +1043,7 @@ void InteractiveGrid::set_selected_color(const godot::Color &p_color) {
 
   Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_selected_color = p_color;
+	data.selected_color = p_color;
 }
 
 godot::Color InteractiveGrid::get_selected_color() const {
@@ -1052,7 +1052,7 @@ godot::Color InteractiveGrid::get_selected_color() const {
 
   Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _selected_color;
+	return data.selected_color;
 }
 
 void InteractiveGrid::set_path_color(const godot::Color &p_color) {
@@ -1061,7 +1061,7 @@ void InteractiveGrid::set_path_color(const godot::Color &p_color) {
 
   Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_path_color = p_color;
+	data.path_color = p_color;
 }
 
 godot::Color InteractiveGrid::get_path_color() const {
@@ -1070,7 +1070,7 @@ godot::Color InteractiveGrid::get_path_color() const {
 
   Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _path_color;
+	return data.path_color;
 }
 
 void InteractiveGrid::set_hovered_color(const godot::Color &p_color) {
@@ -1079,7 +1079,7 @@ void InteractiveGrid::set_hovered_color(const godot::Color &p_color) {
 
   Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_hovered_color = p_color;
+	data.hovered_color = p_color;
 }
 
 godot::Color InteractiveGrid::get_hovered_color() const {
@@ -1088,7 +1088,7 @@ godot::Color InteractiveGrid::get_hovered_color() const {
 
   Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _hovered_color;
+	return data.hovered_color;
 }
 
 void InteractiveGrid::enable_alpha_pass(bool enabled) {
@@ -1099,7 +1099,7 @@ void InteractiveGrid::enable_alpha_pass(bool enabled) {
 
   Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_alpha_pass = enabled;
+	data.alpha_pass = enabled;
 	_destroy();
 }
 
@@ -1111,7 +1111,7 @@ bool InteractiveGrid::is_alpha_pass_enabled() const {
 
   Last Modified: October 12, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _alpha_pass;
+	return data.alpha_pass;
 }
 
 void InteractiveGrid::set_material_override(const godot::Ref<godot::Material> &p_material) {
@@ -1120,7 +1120,7 @@ void InteractiveGrid::set_material_override(const godot::Ref<godot::Material> &p
 
   Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_material_override = p_material;
+	data.material_override = p_material;
 	_destroy();
 }
 
@@ -1130,7 +1130,7 @@ godot::Ref<godot::Material> InteractiveGrid::get_material_override() const {
 
   Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _material_override;
+	return data.material_override;
 }
 
 void InteractiveGrid::apply_default_material() {
@@ -1140,7 +1140,7 @@ void InteractiveGrid::apply_default_material() {
 
   Last Modified: November 21, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	if (_multimesh_instance == nullptr) {
+	if (data.multimesh_instance == nullptr) {
 		PrintError(__FILE__, __FUNCTION__, __LINE__, "No MultiMeshInstance found.");
 		return;
 	}
@@ -1172,7 +1172,7 @@ void InteractiveGrid::apply_default_material() {
 	shader_material->set_shader(shader);
 
 	// Apply it as the material_override of the MultiMeshInstance
-	_multimesh_instance->set_material_override(shader_material);
+	data.multimesh_instance->set_material_override(shader_material);
 
 	if (_debug_options.print_logs_enabled) {
 		PrintLine(__FILE__, __FUNCTION__, __LINE__, "Default ShaderMaterial created and applied.");
@@ -1209,22 +1209,22 @@ void InteractiveGrid::highlight_on_hover(godot::Vector3 global_position) {
 
 	// No cell under the mouse: clean the previously hovered cell (if any)
 	if (closest_index == -1 || !is_cell_visible(closest_index)) {
-		if (_hovered_cell_index > -1) {
-			_set_cell_hovered(_hovered_cell_index, false);
+		if (data.hovered_cell_index > -1) {
+			_set_cell_hovered(data.hovered_cell_index, false);
 
-			bool hovered_cell_is_selected = is_cell_selected(_hovered_cell_index);
+			bool hovered_cell_is_selected = is_cell_selected(data.hovered_cell_index);
 
 			if (!hovered_cell_is_selected) {
-				set_cell_color(_hovered_cell_index, _walkable_color);
+				set_cell_color(data.hovered_cell_index, data.walkable_color);
 			}
 
-			_hovered_cell_index = -1;
+			data.hovered_cell_index = -1;
 		}
 		return;
 	}
 
 	// Already hovering over the same cell: nothing to do
-	if (closest_index == _hovered_cell_index) {
+	if (closest_index == data.hovered_cell_index) {
 		return;
 	}
 
@@ -1232,16 +1232,16 @@ void InteractiveGrid::highlight_on_hover(godot::Vector3 global_position) {
 	bool new_is_selected = is_cell_selected(closest_index);
 
 	// Clear the previously hovered cell (if it exists)
-	if (_hovered_cell_index > -1) {
-		bool old_is_selected = is_cell_selected(_hovered_cell_index);
+	if (data.hovered_cell_index > -1) {
+		bool old_is_selected = is_cell_selected(data.hovered_cell_index);
 
-		_set_cell_hovered(_hovered_cell_index, false);
+		_set_cell_hovered(data.hovered_cell_index, false);
 
 		if (!old_is_selected) {
-			set_cell_color(_hovered_cell_index, _walkable_color);
+			set_cell_color(data.hovered_cell_index, data.walkable_color);
 		}
 
-		_hovered_cell_index = -1;
+		data.hovered_cell_index = -1;
 	}
 
 	// Skip non-walkable cells: only allow hovering on walkable cells
@@ -1258,8 +1258,8 @@ void InteractiveGrid::highlight_on_hover(godot::Vector3 global_position) {
 
 	// If the new cell is not selected, mark it as hovered
 	if (!new_is_selected) {
-		_hovered_cell_index = closest_index;
-		_set_cell_hovered(_hovered_cell_index, true);
+		data.hovered_cell_index = closest_index;
+		_set_cell_hovered(data.hovered_cell_index, true);
 	}
 }
 
@@ -1284,7 +1284,7 @@ godot::Vector3 InteractiveGrid::get_cell_global_position(unsigned int cell_index
 
   Last Modified: September 26, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	godot::Vector3 cell_global_position = _cells.at(cell_index)->global_xform.origin;
+	godot::Vector3 cell_global_position = data.cells.at(cell_index)->global_xform.origin;
 	return cell_global_position;
 }
 
@@ -1295,42 +1295,42 @@ int InteractiveGrid::get_cell_index_from_global_position(godot::Vector3 global_p
 
   Last Modified: October 21, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	if (!(_flags & GFL_CREATED)) {
+	if (!(data.flags & GFL_CREATED)) {
 		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid has not been created.");
 		return -1;
 	}
 
-	if (!_multimesh.is_valid()) {
+	if (!data.multimesh.is_valid()) {
 		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid multimesh is not valid.");
 		return -1;
 	}
 
 	float center_to_edge_x{ 0.0f }, center_to_edge_z{ 0.0f };
-	bool is_even_row = (_rows % 2) == 0;
+	bool is_even_row = (data.rows % 2) == 0;
 
-	switch (_layout_index) {
+	switch (data.layout_index) {
 		case LAYOUT::SQUARE:
 
 			// Calculate the distances between the center and the grid's edges
-			center_to_edge_x = (_columns / 2) * _cell_size.x + _cell_size.x / 2;
-			center_to_edge_z = (_rows / 2) * _cell_size.y + _cell_size.y / 2;
+			center_to_edge_x = (data.columns / 2) * data.cell_size.x + data.cell_size.x / 2;
+			center_to_edge_z = (data.rows / 2) * data.cell_size.y + data.cell_size.y / 2;
 
 			//  Initialize the member `grid_offset_`
-			_grid_offset.x = _grid_center_position.x - center_to_edge_x;
-			_grid_offset.z = _grid_center_position.z - center_to_edge_z;
+			data.grid_offset.x = data.grid_center_position.x - center_to_edge_x;
+			data.grid_offset.z = data.grid_center_position.z - center_to_edge_z;
 
 			if (is_even_row) {
-				if (global_position.x > (_grid_center_position.x + center_to_edge_x - _cell_size.x) || global_position.x < (_grid_center_position.x - center_to_edge_x)) {
+				if (global_position.x > (data.grid_center_position.x + center_to_edge_x - data.cell_size.x) || global_position.x < (data.grid_center_position.x - center_to_edge_x)) {
 					return -1;
 				}
-				if (global_position.z > (_grid_center_position.z + center_to_edge_z - _cell_size.y) || global_position.z < (_grid_center_position.z - center_to_edge_z)) {
+				if (global_position.z > (data.grid_center_position.z + center_to_edge_z - data.cell_size.y) || global_position.z < (data.grid_center_position.z - center_to_edge_z)) {
 					return -1;
 				}
 			} else {
-				if (global_position.x > (_grid_center_position.x + center_to_edge_x) || global_position.x < (_grid_center_position.x - center_to_edge_x)) {
+				if (global_position.x > (data.grid_center_position.x + center_to_edge_x) || global_position.x < (data.grid_center_position.x - center_to_edge_x)) {
 					return -1;
 				}
-				if (global_position.z > (_grid_center_position.z + center_to_edge_z) || global_position.z < (_grid_center_position.z - center_to_edge_z)) {
+				if (global_position.z > (data.grid_center_position.z + center_to_edge_z) || global_position.z < (data.grid_center_position.z - center_to_edge_z)) {
 					return -1;
 				}
 			}
@@ -1338,26 +1338,26 @@ int InteractiveGrid::get_cell_index_from_global_position(godot::Vector3 global_p
 		case LAYOUT::HEXAGONAL:
 
 			// Calculate the distances between the center and the grid's edges
-			center_to_edge_x = (_columns / 2) * _cell_size.x;
-			center_to_edge_z = (_rows / 2) * _cell_size.y;
+			center_to_edge_x = (data.columns / 2) * data.cell_size.x;
+			center_to_edge_z = (data.rows / 2) * data.cell_size.y;
 
 			//  Initialize the member `grid_offset_`
-			_grid_offset.x = _grid_center_position.x - center_to_edge_x;
-			_grid_offset.z = _grid_center_position.z - center_to_edge_z;
+			data.grid_offset.x = data.grid_center_position.x - center_to_edge_x;
+			data.grid_offset.z = data.grid_center_position.z - center_to_edge_z;
 
 			if (is_even_row) {
-				if (global_position.x > (_grid_center_position.x + center_to_edge_x - (_cell_size.x / 2)) || global_position.x < (_grid_center_position.x - center_to_edge_x - _cell_size.x)) {
+				if (global_position.x > (data.grid_center_position.x + center_to_edge_x - (data.cell_size.x / 2)) || global_position.x < (data.grid_center_position.x - center_to_edge_x - data.cell_size.x)) {
 					return -1;
 				}
-				if (global_position.z > (_grid_center_position.z + center_to_edge_z - (_cell_size.y / 2)) || global_position.z < (_grid_center_position.z - center_to_edge_z - _cell_size.y)) {
+				if (global_position.z > (data.grid_center_position.z + center_to_edge_z - (data.cell_size.y / 2)) || global_position.z < (data.grid_center_position.z - center_to_edge_z - data.cell_size.y)) {
 					return -1;
 				}
 			} else {
-				if (global_position.x > (_grid_center_position.x + center_to_edge_x + (_cell_size.x / 2)) || global_position.x < (_grid_center_position.x - center_to_edge_x - _cell_size.x)) {
+				if (global_position.x > (data.grid_center_position.x + center_to_edge_x + (data.cell_size.x / 2)) || global_position.x < (data.grid_center_position.x - center_to_edge_x - data.cell_size.x)) {
 					return -1;
 				}
 
-				if (global_position.z > (_grid_center_position.z + center_to_edge_z + (_cell_size.y / 2)) || global_position.z < (_grid_center_position.z - center_to_edge_z - _cell_size.y)) {
+				if (global_position.z > (data.grid_center_position.z + center_to_edge_z + (data.cell_size.y / 2)) || global_position.z < (data.grid_center_position.z - center_to_edge_z - data.cell_size.y)) {
 					return -1;
 				}
 			}
@@ -1368,12 +1368,12 @@ int InteractiveGrid::get_cell_index_from_global_position(godot::Vector3 global_p
 	int closest_index = -1;
 
 	// Iterate through the cells
-	for (int row = 0; row < _rows; row++) {
-		for (int column = 0; column < _columns; column++) {
+	for (int row = 0; row < data.rows; row++) {
+		for (int column = 0; column < data.columns; column++) {
 			const int index =
-					row * _columns + column; // Index in the 2D array stored as 1D
+					row * data.columns + column; // Index in the 2D array stored as 1D
 
-			const godot::Vector3 cell_pos = _cells.at(index)->global_xform.origin;
+			const godot::Vector3 cell_pos = data.cells.at(index)->global_xform.origin;
 			const float distance = global_position.distance_to(cell_pos);
 
 			if (distance < closest_distance) {
@@ -1393,7 +1393,7 @@ godot::Vector3 InteractiveGrid::get_grid_center_global_position() const {
 
   Last Modified: September 29, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _grid_center_position;
+	return data.grid_center_position;
 }
 
 void InteractiveGrid::center(godot::Vector3 center_position) {
@@ -1403,14 +1403,14 @@ void InteractiveGrid::center(godot::Vector3 center_position) {
   Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-	if (!(_flags & GFL_CREATED)) {
+	if (!(data.flags & GFL_CREATED)) {
 		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid has not been created");
 		return; // !Exit
 	}
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	_flags &= ~GFL_CENTERED; // Reset
+	data.flags &= ~GFL_CENTERED; // Reset
 
 	set_hover_enabled(false); // Prevent hover during grid recentering
 	reset_cells_state();
@@ -1420,7 +1420,7 @@ void InteractiveGrid::center(godot::Vector3 center_position) {
 	configure_astar();
 	set_hover_enabled(true);
 
-	_flags |= GFL_CENTERED;
+	data.flags |= GFL_CENTERED;
 
 	auto end = std::chrono::high_resolution_clock::now();
 
@@ -1440,7 +1440,7 @@ void InteractiveGrid::set_layout(unsigned int value) {
 
   	Last Modified: November 23, 2025
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_layout_index = value;
+	data.layout_index = value;
 	_destroy();
 }
 
@@ -1450,7 +1450,7 @@ unsigned int InteractiveGrid::get_layout() const {
 
 	Last Modified: October 05, 2025
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _layout_index;
+	return data.layout_index;
 }
 
 void InteractiveGrid::set_visible(bool visible) {
@@ -1459,21 +1459,21 @@ void InteractiveGrid::set_visible(bool visible) {
 
   Last Modified: November 21, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	if (!(_flags & GFL_CREATED)) {
+	if (!(data.flags & GFL_CREATED)) {
 		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid has not been created");
 		return; // !Exit
 	}
 
-	if ((_flags & GFL_VISIBLE) && !visible) {
+	if ((data.flags & GFL_VISIBLE) && !visible) {
 		// Visible
 		_set_cells_visible(false);
 		PrintLine(__FILE__, __FUNCTION__, __LINE__, "false.");
-		_flags &= ~GFL_VISIBLE;
-	} else if (!(_flags & GFL_VISIBLE) && visible) {
+		data.flags &= ~GFL_VISIBLE;
+	} else if (!(data.flags & GFL_VISIBLE) && visible) {
 		// Not visible
 		_set_cells_visible(true);
 		PrintLine(__FILE__, __FUNCTION__, __LINE__, "true.");
-		_flags |= GFL_VISIBLE;
+		data.flags |= GFL_VISIBLE;
 	}
 }
 
@@ -1483,7 +1483,7 @@ bool InteractiveGrid::is_visible() const {
 
   Last Modified: May 03, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return (_flags & GFL_VISIBLE) != 0;
+	return (data.flags & GFL_VISIBLE) != 0;
 }
 
 void InteractiveGrid::configure_astar() {
@@ -1498,17 +1498,17 @@ void InteractiveGrid::configure_astar() {
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	_astar->clear();
+	data.astar->clear();
 
 	// Register all grid points and mark obstacles
-	for (int index = 0; index < _cells.size(); ++index) {
-		int x = index % _columns;
-		int y = index / _columns;
-		_astar->add_point(index, godot::Vector2(x, y), 1.0);
-		_astar->set_point_disabled(index, !is_cell_walkable(index));
+	for (int index = 0; index < data.cells.size(); ++index) {
+		int x = index % data.columns;
+		int y = index / data.columns;
+		data.astar->add_point(index, godot::Vector2(x, y), 1.0);
+		data.astar->set_point_disabled(index, !is_cell_walkable(index));
 	}
 
-	switch (_movement) {
+	switch (data.movement) {
 		case MOVEMENT::FOUR_DIRECTIONS:
 			configure_astar_4_dir();
 			break;
@@ -1536,36 +1536,36 @@ void InteractiveGrid::configure_astar_4_dir() {
 
   Last Modified: October 09, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	for (int row = 0; row < _rows; row++) {
-		for (int column = 0; column < _columns; column++) {
-			const int index = row * _columns + column;
+	for (int row = 0; row < data.rows; row++) {
+		for (int column = 0; column < data.columns; column++) {
+			const int index = row * data.columns + column;
 
 			// Connect to the right
-			if (column + 1 < _columns) {
-				int right = row * _columns + (column + 1);
-				_astar->connect_points(index, right);
-				_cells.at(index)->neighbors.push_back(right);
+			if (column + 1 < data.columns) {
+				int right = row * data.columns + (column + 1);
+				data.astar->connect_points(index, right);
+				data.cells.at(index)->neighbors.push_back(right);
 			}
 
 			// Connect to the left
 			if (column - 1 >= 0) {
-				int left = row * _columns + (column - 1);
+				int left = row * data.columns + (column - 1);
 				//_astar->connect_points(index, left);
-				_cells.at(index)->neighbors.push_back(left);
+				data.cells.at(index)->neighbors.push_back(left);
 			}
 
 			// Connect to the down
-			if (row + 1 < _rows) {
-				int down = (row + 1) * _columns + column;
-				_astar->connect_points(index, down);
-				_cells.at(index)->neighbors.push_back(down);
+			if (row + 1 < data.rows) {
+				int down = (row + 1) * data.columns + column;
+				data.astar->connect_points(index, down);
+				data.cells.at(index)->neighbors.push_back(down);
 			}
 
 			// Connect to the up
 			if (row - 1 >= 0) {
-				int up = (row - 1) * _columns + column;
+				int up = (row - 1) * data.columns + column;
 				//_astar->connect_points(index, up);
-				_cells.at(index)->neighbors.push_back(up);
+				data.cells.at(index)->neighbors.push_back(up);
 			}
 		}
 	}
@@ -1600,9 +1600,9 @@ void InteractiveGrid::configure_astar_6_dir() {
 		{ 0, +1 } // South-West
 	};
 
-	for (int row = 0; row < _rows; row++) {
-		for (int column = 0; column < _columns; column++) {
-			const int index = row * _columns + column;
+	for (int row = 0; row < data.rows; row++) {
+		for (int column = 0; column < data.columns; column++) {
+			const int index = row * data.columns + column;
 
 			if (!is_cell_walkable(index))
 				continue;
@@ -1614,17 +1614,17 @@ void InteractiveGrid::configure_astar_6_dir() {
 				int nx = column + dirs[d][0];
 				int ny = row + dirs[d][1];
 
-				if (nx >= 0 && nx < _columns && ny >= 0 && ny < _rows) {
-					int neighbor_index = ny * _columns + nx;
+				if (nx >= 0 && nx < data.columns && ny >= 0 && ny < data.rows) {
+					int neighbor_index = ny * data.columns + nx;
 
 					if (is_cell_walkable(neighbor_index)) {
 						// Add the neighbor if it doesn't already exist
-						if (!_astar->has_point(neighbor_index)) {
-							_astar->add_point(neighbor_index, godot::Vector2(nx, ny));
+						if (!data.astar->has_point(neighbor_index)) {
+							data.astar->add_point(neighbor_index, godot::Vector2(nx, ny));
 						}
 
-						_astar->connect_points(index, neighbor_index);
-						_cells.at(index)->neighbors.push_back(neighbor_index);
+						data.astar->connect_points(index, neighbor_index);
+						data.cells.at(index)->neighbors.push_back(neighbor_index);
 					}
 				}
 			}
@@ -1642,9 +1642,9 @@ void InteractiveGrid::configure_astar_8_dir() {
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
 	// Create 8-direction connections
-	for (int row = 0; row < _rows; row++) {
-		for (int column = 0; column < _columns; column++) {
-			const int index = row * _columns + column;
+	for (int row = 0; row < data.rows; row++) {
+		for (int column = 0; column < data.columns; column++) {
+			const int index = row * data.columns + column;
 
 			for (int row_offset = -1; row_offset <= 1; ++row_offset) {
 				for (int col_offset = -1; col_offset <= 1; ++col_offset) {
@@ -1654,14 +1654,14 @@ void InteractiveGrid::configure_astar_8_dir() {
 					int nx = column + col_offset;
 					int ny = row + row_offset;
 
-					if (nx >= 0 && nx < _columns && ny >= 0 && ny < _rows) {
-						int neighbor_index = ny * _columns + nx;
+					if (nx >= 0 && nx < data.columns && ny >= 0 && ny < data.rows) {
+						int neighbor_index = ny * data.columns + nx;
 
 						// Check if the neighbor is walkable before connecting
 						bool neighbor_walkable = is_cell_walkable(neighbor_index);
 						if (neighbor_walkable) {
-							_astar->connect_points(index, neighbor_index);
-							_cells.at(index)->neighbors.push_back(neighbor_index);
+							data.astar->connect_points(index, neighbor_index);
+							data.cells.at(index)->neighbors.push_back(neighbor_index);
 						}
 					}
 				}
@@ -1688,11 +1688,11 @@ void InteractiveGrid::compute_unreachable_cells(unsigned int start_cell_index) {
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	if ((_flags & GFL_VISIBLE) && !(_flags & GFL_CELL_UNREACHABLE_HIDDEN)) {
+	if ((data.flags & GFL_VISIBLE) && !(data.flags & GFL_CELL_UNREACHABLE_HIDDEN)) {
 		configure_astar();
 		breadth_first_search(start_cell_index);
 
-		_flags |= GFL_CELL_UNREACHABLE_HIDDEN;
+		data.flags |= GFL_CELL_UNREACHABLE_HIDDEN;
 	}
 
 	auto end = std::chrono::high_resolution_clock::now();
@@ -1721,7 +1721,7 @@ void InteractiveGrid::breadth_first_search(unsigned int start_cell_index) {
 		godot::PackedInt64Array neighbors{};
 	};
 
-	unsigned int grid_size = _rows * _columns;
+	unsigned int grid_size = data.rows * data.columns;
 	godot::Vector<BSFNode> graph;
 	graph.resize(grid_size);
 
@@ -1779,22 +1779,22 @@ void InteractiveGrid::hide_distant_cells(unsigned int start_cell_index, float di
 		return; // !Exit
 	}
 
-	if ((_flags & GFL_VISIBLE) && !(_flags & GFL_CELL_DISTANT_HIDDEN)) {
+	if ((data.flags & GFL_VISIBLE) && !(data.flags & GFL_CELL_DISTANT_HIDDEN)) {
 		// Iterate through the cells
-		for (int row = 0; row < _rows; row++) {
-			for (int column = 0; column < _columns; column++) {
-				const int index = row * _columns + column;
+		for (int row = 0; row < data.rows; row++) {
+			for (int column = 0; column < data.columns; column++) {
+				const int index = row * data.columns + column;
 
-				godot::Vector3 start_cell_position = _cells.at(start_cell_index)->global_xform.origin;
-				godot::Vector3 index_cell_position = _cells.at(index)->global_xform.origin;
+				godot::Vector3 start_cell_position = data.cells.at(start_cell_index)->global_xform.origin;
+				godot::Vector3 index_cell_position = data.cells.at(index)->global_xform.origin;
 
 				if (start_cell_position.distance_to(index_cell_position) > distance) {
 					set_cell_visible(index, false);
-					_cells.at(index)->flags &= ~CFL_WALKABLE;
+					data.cells.at(index)->flags &= ~CFL_WALKABLE;
 				}
 			}
 		}
-		_flags |= GFL_CELL_DISTANT_HIDDEN;
+		data.flags |= GFL_CELL_DISTANT_HIDDEN;
 	}
 }
 
@@ -1804,15 +1804,15 @@ void InteractiveGrid::set_hover_enabled(bool enabled) {
 
 	Last Modified: October 10, 2025
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	if (!(_flags & GFL_CREATED)) {
+	if (!(data.flags & GFL_CREATED)) {
 		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid has not been created");
 		return; // !Exit
 	}
 
 	if (enabled) {
-		_flags |= GFL_HOVER_ENABLED; // Set the flag
+		data.flags |= GFL_HOVER_ENABLED; // Set the flag
 	} else {
-		_flags &= ~GFL_HOVER_ENABLED; // Clear the flag
+		data.flags &= ~GFL_HOVER_ENABLED; // Clear the flag
 	}
 }
 
@@ -1823,7 +1823,7 @@ bool InteractiveGrid::is_hover_enabled() const {
 
   Last Modified: October 10, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return (_flags & GFL_HOVER_ENABLED) != 0;
+	return (data.flags & GFL_HOVER_ENABLED) != 0;
 }
 
 bool InteractiveGrid::is_created() const {
@@ -1832,7 +1832,7 @@ bool InteractiveGrid::is_created() const {
 
   Last Modified: May 03, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return (_flags & GFL_CREATED) != 0;
+	return (data.flags & GFL_CREATED) != 0;
 }
 
 bool InteractiveGrid::is_centered() const {
@@ -1842,7 +1842,7 @@ bool InteractiveGrid::is_centered() const {
 
   Last Modified: October 10, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return (_flags & GFL_CENTERED) != 0;
+	return (data.flags & GFL_CENTERED) != 0;
 }
 
 bool InteractiveGrid::is_cell_walkable(unsigned int cell_index) const {
@@ -1852,7 +1852,7 @@ bool InteractiveGrid::is_cell_walkable(unsigned int cell_index) const {
 
   Last Modified: October 07, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return (_cells.at(cell_index)->flags & CFL_WALKABLE) != 0;
+	return (data.cells.at(cell_index)->flags & CFL_WALKABLE) != 0;
 }
 
 bool InteractiveGrid::is_cell_reachable(unsigned int cell_index) const {
@@ -1862,7 +1862,7 @@ bool InteractiveGrid::is_cell_reachable(unsigned int cell_index) const {
 
   Last Modified: November 20, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return (_cells.at(cell_index)->flags & CFL_REACHABLE) != 0;
+	return (data.cells.at(cell_index)->flags & CFL_REACHABLE) != 0;
 }
 
 bool InteractiveGrid::is_cell_in_void(unsigned int cell_index) const {
@@ -1871,7 +1871,7 @@ bool InteractiveGrid::is_cell_in_void(unsigned int cell_index) const {
 
   Last Modified: October 10, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return (_cells.at(cell_index)->flags & CFL_IN_VOID) != 0;
+	return (data.cells.at(cell_index)->flags & CFL_IN_VOID) != 0;
 }
 
 bool InteractiveGrid::is_cell_hovered(const unsigned int cell_index) const {
@@ -1881,7 +1881,7 @@ bool InteractiveGrid::is_cell_hovered(const unsigned int cell_index) const {
 
   Last Modified: October 07, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return (_cells.at(cell_index)->flags & CFL_HOVERED) != 0;
+	return (data.cells.at(cell_index)->flags & CFL_HOVERED) != 0;
 }
 
 bool InteractiveGrid::is_cell_selected(unsigned int cell_index) const {
@@ -1891,7 +1891,7 @@ bool InteractiveGrid::is_cell_selected(unsigned int cell_index) const {
 
   Last Modified: October 07, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return (_cells.at(cell_index)->flags & CFL_SELECTED) != 0;
+	return (data.cells.at(cell_index)->flags & CFL_SELECTED) != 0;
 }
 
 bool InteractiveGrid::is_cell_on_path(unsigned int cell_index) const {
@@ -1901,7 +1901,7 @@ bool InteractiveGrid::is_cell_on_path(unsigned int cell_index) const {
 
   Last Modified: October 11, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return (_cells.at(cell_index)->flags & CFL_PATH) != 0;
+	return (data.cells.at(cell_index)->flags & CFL_PATH) != 0;
 }
 
 bool InteractiveGrid::is_cell_visible(unsigned int cell_index) const {
@@ -1911,7 +1911,7 @@ bool InteractiveGrid::is_cell_visible(unsigned int cell_index) const {
 
   Last Modified: October 07, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return (_cells.at(cell_index)->flags & CFL_VISIBLE) != 0;
+	return (data.cells.at(cell_index)->flags & CFL_VISIBLE) != 0;
 }
 
 void InteractiveGrid::set_cell_walkable(unsigned int cell_index, bool is_walkable) {
@@ -1925,11 +1925,11 @@ void InteractiveGrid::set_cell_walkable(unsigned int cell_index, bool is_walkabl
 	}
 
 	if (is_walkable) {
-		_cells.at(cell_index)->flags |= CFL_WALKABLE;
-		set_cell_color(cell_index, _walkable_color);
+		data.cells.at(cell_index)->flags |= CFL_WALKABLE;
+		set_cell_color(cell_index, data.walkable_color);
 	} else if (!is_walkable) {
-		_cells.at(cell_index)->flags &= ~CFL_WALKABLE;
-		set_cell_color(cell_index, _unwalkable_color);
+		data.cells.at(cell_index)->flags &= ~CFL_WALKABLE;
+		set_cell_color(cell_index, data.unwalkable_color);
 	}
 }
 
@@ -1944,10 +1944,10 @@ void InteractiveGrid::set_cell_reachable(unsigned int cell_index, bool is_reacha
 	}
 
 	if (is_reachable) {
-		_cells.at(cell_index)->flags |= CFL_REACHABLE;
+		data.cells.at(cell_index)->flags |= CFL_REACHABLE;
 	} else if (!is_reachable) {
-		_cells.at(cell_index)->flags &= ~CFL_REACHABLE;
-		set_cell_color(cell_index, _unreachable_color);
+		data.cells.at(cell_index)->flags &= ~CFL_REACHABLE;
+		set_cell_color(cell_index, data.unreachable_color);
 	}
 }
 
@@ -1961,15 +1961,15 @@ void InteractiveGrid::set_cell_visible(unsigned int cell_index, bool is_visible)
 		return; // !Exit
 	}
 
-	godot::Color current_cell_color = _cells.at(cell_index)->color;
+	godot::Color current_cell_color = data.cells.at(cell_index)->color;
 
 	if (is_visible) {
-		_cells.at(cell_index)->flags |= CFL_VISIBLE;
+		data.cells.at(cell_index)->flags |= CFL_VISIBLE;
 		set_cell_color(cell_index, current_cell_color);
 	} else if (!is_visible) {
 		current_cell_color.a = 0.0;
-		_multimesh->set_instance_custom_data(cell_index, current_cell_color);
-		_cells.at(cell_index)->flags &= ~CFL_VISIBLE;
+		data.multimesh->set_instance_custom_data(cell_index, current_cell_color);
+		data.cells.at(cell_index)->flags &= ~CFL_VISIBLE;
 	}
 }
 
@@ -1981,25 +1981,25 @@ void InteractiveGrid::InteractiveGrid::reset_cells_state() {
   Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-	if (!(_flags & GFL_CREATED)) {
+	if (!(data.flags & GFL_CREATED)) {
 		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid has not been created");
 		return; // !Exit
 	}
 
 	// Iterate through the cells
-	for (int row = 0; row < _rows; row++) {
-		for (int column = 0; column < _columns; column++) {
-			const int index = row * _columns + column;
-			_cells.at(index)->flags = 0; // Reset
+	for (int row = 0; row < data.rows; row++) {
+		for (int column = 0; column < data.columns; column++) {
+			const int index = row * data.columns + column;
+			data.cells.at(index)->flags = 0; // Reset
 			//set_cell_visible(index, false);
 		}
 	}
 
-	_flags &= ~GFL_CELL_UNREACHABLE_HIDDEN; // Reset
-	_flags &= ~GFL_CELL_DISTANT_HIDDEN; // Reset
+	data.flags &= ~GFL_CELL_UNREACHABLE_HIDDEN; // Reset
+	data.flags &= ~GFL_CELL_DISTANT_HIDDEN; // Reset
 
-	_hovered_cell_index = -1;
-	_selected_cells.clear();
+	data.hovered_cell_index = -1;
+	data.selected_cells.clear();
 }
 
 void InteractiveGrid::set_cell_color(unsigned int cell_index, const godot::Color &p_color) {
@@ -2012,14 +2012,14 @@ void InteractiveGrid::set_cell_color(unsigned int cell_index, const godot::Color
 		return; // !Exit
 	}
 
-	if (_alpha_pass) {
-		uint32_t cell_flags = _cells.at(cell_index)->flags;
+	if (data.alpha_pass) {
+		uint32_t cell_flags = data.cells.at(cell_index)->flags;
 		godot::Color new_cell_color{ p_color.r, p_color.g, p_color.b, static_cast<float>(cell_flags) };
-		_cells.at(cell_index)->color = new_cell_color;
-		_multimesh->set_instance_custom_data(cell_index, new_cell_color);
+		data.cells.at(cell_index)->color = new_cell_color;
+		data.multimesh->set_instance_custom_data(cell_index, new_cell_color);
 	} else {
-		_cells.at(cell_index)->color = p_color;
-		_multimesh->set_instance_custom_data(cell_index, p_color);
+		data.cells.at(cell_index)->color = p_color;
+		data.multimesh->set_instance_custom_data(cell_index, p_color);
 	}
 }
 
@@ -2031,7 +2031,7 @@ void InteractiveGrid::set_obstacles_collision_masks(unsigned int masks) {
 
   Last Modified: September 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_obstacles_collision_masks = masks;
+	data.obstacles_collision_masks = masks;
 }
 
 int InteractiveGrid::get_obstacles_collision_masks() {
@@ -2042,7 +2042,7 @@ int InteractiveGrid::get_obstacles_collision_masks() {
 
   Last Modified: September 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _obstacles_collision_masks;
+	return data.obstacles_collision_masks;
 }
 
 void InteractiveGrid::set_grid_floor_collision_masks(unsigned int masks) {
@@ -2052,7 +2052,7 @@ void InteractiveGrid::set_grid_floor_collision_masks(unsigned int masks) {
 
   Last Modified: October 04, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	_floor_collision_masks = masks;
+	data.floor_collision_masks = masks;
 }
 
 int InteractiveGrid::get_grid_floor_collision_masks() {
@@ -2064,7 +2064,7 @@ int InteractiveGrid::get_grid_floor_collision_masks() {
 
   Last Modified: October 04, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _floor_collision_masks;
+	return data.floor_collision_masks;
 }
 
 void InteractiveGrid::select_cell(godot::Vector3 global_position) {
@@ -2100,7 +2100,7 @@ void InteractiveGrid::select_cell(godot::Vector3 global_position) {
 		bool walkable = is_cell_walkable(closest_index);
 		if (walkable) {
 			_set_cell_selected(closest_index, true);
-			_selected_cells.push_back(closest_index);
+			data.selected_cells.push_back(closest_index);
 		}
 	}
 }
@@ -2111,7 +2111,7 @@ godot::Array InteractiveGrid::get_selected_cells() {
 
   Last Modified: September 26, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _selected_cells;
+	return data.selected_cells;
 }
 
 int InteractiveGrid::get_latest_selected() {
@@ -2120,7 +2120,7 @@ int InteractiveGrid::get_latest_selected() {
 
   Last Modified: September 29, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _selected_cells.back();
+	return data.selected_cells.back();
 }
 
 godot::PackedInt64Array InteractiveGrid::get_path(unsigned int start_cell_index, unsigned int target_cell_index) const {
@@ -2137,14 +2137,14 @@ godot::PackedInt64Array InteractiveGrid::get_path(unsigned int start_cell_index,
 
 	godot::PackedInt64Array path;
 
-	if (!(_flags & GFL_CREATED)) {
+	if (!(data.flags & GFL_CREATED)) {
 		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid has not been created");
 		return path; // !Exit
 	}
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	path = _astar->get_id_path(start_cell_index, target_cell_index);
+	path = data.astar->get_id_path(start_cell_index, target_cell_index);
 
 	auto end = std::chrono::high_resolution_clock::now();
 
@@ -2163,7 +2163,7 @@ godot::PackedInt64Array InteractiveGrid::get_neighbors(unsigned int cell_index) 
 
   Last Modified: November 20, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return _cells.at(cell_index)->neighbors;
+	return data.cells.at(cell_index)->neighbors;
 }
 
 void InteractiveGrid::set_print_logs_enabled(bool enabled) {
@@ -2212,8 +2212,8 @@ bool InteractiveGrid::is_cell_index_out_of_bounds(const godot::String &file, con
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	bool is_out_of_bounds = false;
 
-	if (cell_index >= (_rows * _columns)) {
-		PrintError(file, func, line, "Cell index out of bounds: ", cell_index, " >= ", (_rows * _columns));
+	if (cell_index >= (data.rows * data.columns)) {
+		PrintError(file, func, line, "Cell index out of bounds: ", cell_index, " >= ", (data.rows * data.columns));
 		is_out_of_bounds = true;
 	}
 

@@ -128,49 +128,51 @@ private:
     Grid data members
   --------------------------------------------------------------------*/
 
-	// --- Grid
+	struct Data {
+		// Grid.
 
-	unsigned int _rows{ 9 };
-	unsigned int _columns{ 9 };
-	uint32_t _flags = 0;
+		unsigned int rows{ 9 };
+		unsigned int columns{ 9 };
+		uint32_t flags = 0;
 
-	godot::Vector3 _grid_center_position = godot::Vector3(0.0f, 0.0f, 0.0f);
-	godot::Vector3 _grid_offset = godot::Vector3(0.0f, 0.0f, 0.0f);
-	godot::Ref<godot::AStar2D> _astar;
+		godot::Vector3 grid_center_position = godot::Vector3(0.0f, 0.0f, 0.0f);
+		godot::Vector3 grid_offset = godot::Vector3(0.0f, 0.0f, 0.0f);
+		godot::Ref<godot::AStar2D> astar;
 
-	unsigned int _layout_index{ 0 };
-	unsigned int _movement{ 0 };
-	unsigned int _obstacles_collision_masks{ 1 << 13 }; // mask 14 = pow(2,13) = 1 << 13 = 8192
-	unsigned int _floor_collision_masks{ 1 << 14 }; // mask 15 = pow(2,14) = 1 << 14 = 16384
+		unsigned int layout_index{ 0 };
+		unsigned int movement{ 0 };
+		unsigned int obstacles_collision_masks{ 1 << 13 }; // mask 14 = pow(2,13) = 1 << 13 = 8192
+		unsigned int floor_collision_masks{ 1 << 14 }; // mask 15 = pow(2,14) = 1 << 14 = 16384
 
-	// --- Cells
+		// Cells.
 
-	godot::Ref<godot::Mesh> _cell_mesh;
-	godot::MultiMeshInstance3D *_multimesh_instance;
-	godot::Ref<godot::MultiMesh> _multimesh;
-	godot::Vector2 _cell_size = godot::Vector2(1.0f, 1.0f);
-	std::vector<Cell *> _cells;
-	godot::Array _selected_cells;
-	int _hovered_cell_index{ -1 };
+		godot::Ref<godot::Mesh> cell_mesh;
+		godot::MultiMeshInstance3D *multimesh_instance;
+		godot::Ref<godot::MultiMesh> multimesh;
+		godot::Vector2 cell_size = godot::Vector2(1.0f, 1.0f);
+		std::vector<Cell *> cells;
+		godot::Array selected_cells;
+		int hovered_cell_index{ -1 };
 
-	// --- Colors
+		// Colors.
 
-	godot::Color _walkable_color{ godot::Color(0.5, 0.65, 1.0, 1) }; // BLUE
-	godot::Color _unwalkable_color{ godot::Color(0.8039216, 0.36078432, 0.36078432, 1.0) }; // INDIAN_RED
-	godot::Color _unreachable_color{ godot::Color(1.0, 1.0, 1.0, 1.0) }; // #ffffff00
-	godot::Color _selected_color{ godot::Color(0.8784314, 1.0, 1.0, 1.0) }; // LIGHT_CYAN
-	godot::Color _path_color{ godot::Color(0.5647059, 0.93333334, 0.5647059, 1) };
-	godot::Color _hovered_color{ godot::Color(1.0, 0.84313726, 0, 1.0) };
+		godot::Color walkable_color{ godot::Color(0.5, 0.65, 1.0, 1) }; // BLUE
+		godot::Color unwalkable_color{ godot::Color(0.8039216, 0.36078432, 0.36078432, 1.0) }; // INDIAN_RED
+		godot::Color unreachable_color{ godot::Color(1.0, 1.0, 1.0, 1.0) }; // #ffffff00
+		godot::Color selected_color{ godot::Color(0.8784314, 1.0, 1.0, 1.0) }; // LIGHT_CYAN
+		godot::Color path_color{ godot::Color(0.5647059, 0.93333334, 0.5647059, 1) };
+		godot::Color hovered_color{ godot::Color(1.0, 0.84313726, 0, 1.0) };
 
-	// --- Material
+		// Material.
 
-	godot::Ref<godot::Material> _material_override;
+		godot::Ref<godot::Material> material_override;
+		bool alpha_pass{ false };
 
-	// --- Scan environnement
+		// Scan environnement.
 
-	godot::Ref<godot::BoxShape3D> _obstacle_shape;
+		godot::Ref<godot::BoxShape3D> obstacle_shape;
 
-	bool _alpha_pass{ false };
+	} data;
 
 protected:
 	static void _bind_methods();
