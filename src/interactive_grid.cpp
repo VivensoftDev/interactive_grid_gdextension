@@ -2112,7 +2112,7 @@ void InteractiveGrid::set_cell_in_void(unsigned int cell_index, bool is_in_void)
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Marks a cell as being "in void" or not. If a cell is in void,
 	       it is hidden and flagged accordingly. Used to prevent cells
-	       above empty space or near obstacles from being displayed.
+	       above empty space.
 
   Last Modified: October 10, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
