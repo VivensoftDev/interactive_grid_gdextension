@@ -38,7 +38,6 @@ Author: Antoine Charruel
 #include <algorithm>
 #include <chrono>
 #include <queue>
-#include <thread>
 
 class InteractiveGrid : public godot::Node3D {
 private:
