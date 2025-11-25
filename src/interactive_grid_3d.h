@@ -39,9 +39,9 @@ Author: Antoine Charruel
 #include <chrono>
 #include <queue>
 
-class InteractiveGrid : public godot::Node3D {
+class InteractiveGrid3D: public godot::Node3D {
 private:
-	GDCLASS(InteractiveGrid, Node3D);
+	GDCLASS(InteractiveGrid3D, Node3D);
 
 	enum LAYOUT {
 		SQUARE = 0,
@@ -176,8 +176,8 @@ protected:
 	static void _bind_methods();
 
 public:
-	InteractiveGrid();
-	~InteractiveGrid();
+	InteractiveGrid3D();
+	~InteractiveGrid3D();
 
 	// Godot engine
 	virtual void _ready() override;

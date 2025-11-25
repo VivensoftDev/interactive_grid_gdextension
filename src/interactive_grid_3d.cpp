@@ -1,24 +1,24 @@
 /*+===================================================================
 File: interactive_grid.cpp
 
-Summary: InteractiveGrid is a Godot 4.5 GDExtension that allows player
+Summary: InteractiveGrid3D is a Godot 4.5 GDExtension that allows player
          interaction with a 3D grid, including cell selection,
 		 pathfinding, and hover highlights.
 
 Last Modified: November 23, 2025
 
-This file is part of the InteractiveGrid GDExtension Source Code.
+This file is part of the InteractiveGrid3D GDExtension Source Code.
 Repository: https://github.com/antoinecharruel/interactive_grid
 
-Version InteractiveGrid: 1.4.0
+Version InteractiveGrid3D: 1.4.0
 Version: Godot Engine v4.5.stable.steam - https://godotengine.org
 
 Author: Antoine Charruel
 ===================================================================+*/
 
-#include "interactive_grid.h"
+#include "interactive_grid_3d.h"
 
-void InteractiveGrid::_create() {
+void InteractiveGrid3D::_create() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Initializes the grid if it has not been created yet.
 
@@ -42,7 +42,7 @@ void InteractiveGrid::_create() {
 	}
 }
 
-void InteractiveGrid::_destroy() {
+void InteractiveGrid3D::_destroy() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Frees all grid resources and resets state.
 
@@ -68,7 +68,7 @@ void InteractiveGrid::_destroy() {
 	}
 }
 
-void InteractiveGrid::_init_multi_mesh() {
+void InteractiveGrid3D::_init_multi_mesh() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Initializes and configures the MultiMesh used for rendering 
            the grid efficiently. MultiMesh enables high-
@@ -128,7 +128,7 @@ void InteractiveGrid::_init_multi_mesh() {
 	}
 }
 
-void InteractiveGrid::_init_astar() {
+void InteractiveGrid3D::_init_astar() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Initializes the A* pathfinding instance by creating a new 
            AStar2D object. Must be called before configuring points or
@@ -139,7 +139,7 @@ void InteractiveGrid::_init_astar() {
 	data.astar.instantiate(); // Create the AStar2D instance
 }
 
-void InteractiveGrid::_layout(godot::Vector3 center_position) {
+void InteractiveGrid3D::_layout(godot::Vector3 center_position) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Positions the cells around the center according to the 
            selected layout.
@@ -162,7 +162,7 @@ void InteractiveGrid::_layout(godot::Vector3 center_position) {
 	}
 }
 
-void InteractiveGrid::_layout_cells_as_square_grid(godot::Vector3 center_position) {
+void InteractiveGrid3D::_layout_cells_as_square_grid(godot::Vector3 center_position) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: This method arranges the cells of the grid into a 
            square grid layout, positioning each cell relative to a pawn.
@@ -216,7 +216,7 @@ void InteractiveGrid::_layout_cells_as_square_grid(godot::Vector3 center_positio
 	}
 }
 
-void InteractiveGrid::_layout_cells_as_hexagonal_grid(godot::Vector3 center_position) {
+void InteractiveGrid3D::_layout_cells_as_hexagonal_grid(godot::Vector3 center_position) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: This method arranges the cells of the grid into a 
            hexagonal grid layout, positioning each cell relative to a pawn.
@@ -292,7 +292,7 @@ void InteractiveGrid::_layout_cells_as_hexagonal_grid(godot::Vector3 center_posi
 	}
 }
 
-void InteractiveGrid::_align_cells_with_floor() {
+void InteractiveGrid3D::_align_cells_with_floor() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Aligns each grid cell with the underlying floor
         using a vertical downward raycast.
@@ -452,7 +452,7 @@ void InteractiveGrid::_align_cells_with_floor() {
 	}
 }
 
-void InteractiveGrid::_scan_environnement_obstacles() {
+void InteractiveGrid3D::_scan_environnement_obstacles() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Scans the game grid to detect obstacles and updates the 
            corresponding grid cells as walkable or unwalkable. For each 
@@ -582,7 +582,7 @@ void InteractiveGrid::_scan_environnement_obstacles() {
 	}
 }
 
-void InteractiveGrid::_apply_material(const godot::Ref<godot::Material> &p_material) {
+void InteractiveGrid3D::_apply_material(const godot::Ref<godot::Material> &p_material) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Applies the supplied material as an override to the grid’s
            MultiMeshInstance
@@ -605,7 +605,7 @@ void InteractiveGrid::_apply_material(const godot::Ref<godot::Material> &p_mater
 	}
 }
 
-void InteractiveGrid::_set_cells_visible(bool visible) {
+void InteractiveGrid3D::_set_cells_visible(bool visible) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Toggles the visual visibility of every cell in the grid.
 
@@ -630,7 +630,7 @@ void InteractiveGrid::_set_cells_visible(bool visible) {
 	_apply_material(data.material_override);
 }
 
-void InteractiveGrid::_set_cell_in_void(unsigned int cell_index, bool is_in_void) {
+void InteractiveGrid3D::_set_cell_in_void(unsigned int cell_index, bool is_in_void) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Marks a cell as being "in void" or not. If a cell is in void,
 	       it is hidden and flagged accordingly. Used to prevent cells
@@ -650,7 +650,7 @@ void InteractiveGrid::_set_cell_in_void(unsigned int cell_index, bool is_in_void
 	}
 }
 
-void InteractiveGrid::_set_cell_hovered(unsigned int cell_index, bool is_hovered) {
+void InteractiveGrid3D::_set_cell_hovered(unsigned int cell_index, bool is_hovered) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets whether a particular grid cell (cell_index) is hovered.
 
@@ -668,7 +668,7 @@ void InteractiveGrid::_set_cell_hovered(unsigned int cell_index, bool is_hovered
 	}
 }
 
-void InteractiveGrid::_set_cell_selected(unsigned int cell_index, bool is_selected) {
+void InteractiveGrid3D::_set_cell_selected(unsigned int cell_index, bool is_selected) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets whether a specific grid cell (cell_index) is marked as 
            selected.
@@ -687,7 +687,7 @@ void InteractiveGrid::_set_cell_selected(unsigned int cell_index, bool is_select
 	}
 }
 
-void InteractiveGrid::_set_cell_on_path(unsigned int cell_index, bool is_on_path) {
+void InteractiveGrid3D::_set_cell_on_path(unsigned int cell_index, bool is_on_path) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets whether a specific grid cell (cell_index) is part of the 
            current path.
@@ -706,7 +706,7 @@ void InteractiveGrid::_set_cell_on_path(unsigned int cell_index, bool is_on_path
 	}
 }
 
-void InteractiveGrid::_bind_methods() {
+void InteractiveGrid3D::_bind_methods() {
 	/*F+F+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	Summary: _bind_methods, is a static function that Godot will call to 
 				find out which methods can be called and which properties it
@@ -717,119 +717,119 @@ void InteractiveGrid::_bind_methods() {
 
 	// --- Grid dimensions
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_rows"), &InteractiveGrid::set_rows);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_rows"), &InteractiveGrid::get_rows);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_rows"), &InteractiveGrid3D::set_rows);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_rows"), &InteractiveGrid3D::get_rows);
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_columns"), &InteractiveGrid::set_columns);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_columns"), &InteractiveGrid::get_columns);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_columns"), &InteractiveGrid3D::set_columns);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_columns"), &InteractiveGrid3D::get_columns);
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_cell_size"), &InteractiveGrid::set_cell_size);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_cell_size"), &InteractiveGrid::get_cell_size);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_cell_size"), &InteractiveGrid3D::set_cell_size);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_cell_size"), &InteractiveGrid3D::get_cell_size);
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_cell_mesh", "_cell_mesh"), &InteractiveGrid::set_cell_mesh);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_cell_mesh"), &InteractiveGrid::get_cell_mesh);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_cell_mesh", "_cell_mesh"), &InteractiveGrid3D::set_cell_mesh);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_cell_mesh"), &InteractiveGrid3D::get_cell_mesh);
 
 	// --- Grid colors
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_walkable_color"), &InteractiveGrid::set_walkable_color);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_walkable_color"), &InteractiveGrid::get_walkable_color);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_walkable_color"), &InteractiveGrid3D::set_walkable_color);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_walkable_color"), &InteractiveGrid3D::get_walkable_color);
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_unwalkable_color"), &InteractiveGrid::set_unwalkable_color);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_unwalkable_color"), &InteractiveGrid::get_unwalkable_color);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_unwalkable_color"), &InteractiveGrid3D::set_unwalkable_color);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_unwalkable_color"), &InteractiveGrid3D::get_unwalkable_color);
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_unreachable_color"), &InteractiveGrid::set_unreachable_color);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_unreachable_color"), &InteractiveGrid::get_unreachable_color);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_unreachable_color"), &InteractiveGrid3D::set_unreachable_color);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_unreachable_color"), &InteractiveGrid3D::get_unreachable_color);
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_selected_color"), &InteractiveGrid::set_selected_color);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_selected_color"), &InteractiveGrid::get_selected_color);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_selected_color"), &InteractiveGrid3D::set_selected_color);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_selected_color"), &InteractiveGrid3D::get_selected_color);
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_path_color"), &InteractiveGrid::set_path_color);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_path_color"), &InteractiveGrid::get_path_color);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_path_color"), &InteractiveGrid3D::set_path_color);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_path_color"), &InteractiveGrid3D::get_path_color);
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_hovered_color"), &InteractiveGrid::set_hovered_color);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_hovered_color"), &InteractiveGrid::get_hovered_color);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_hovered_color"), &InteractiveGrid3D::set_hovered_color);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_hovered_color"), &InteractiveGrid3D::get_hovered_color);
 
 	// --- Grid materials
 
-	godot::ClassDB::bind_method(godot::D_METHOD("get_material_override"), &InteractiveGrid::get_material_override);
-	godot::ClassDB::bind_method(godot::D_METHOD("set_material_override", "material"), &InteractiveGrid::set_material_override);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_material_override"), &InteractiveGrid3D::get_material_override);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_material_override", "material"), &InteractiveGrid3D::set_material_override);
 
 	// --- Highlight (Surbillance)
 
-	godot::ClassDB::bind_method(godot::D_METHOD("highlight_on_hover", "global_position"), &InteractiveGrid::highlight_on_hover);
-	godot::ClassDB::bind_method(godot::D_METHOD("highlight_path", "path"), &InteractiveGrid::highlight_path);
+	godot::ClassDB::bind_method(godot::D_METHOD("highlight_on_hover", "global_position"), &InteractiveGrid3D::highlight_on_hover);
+	godot::ClassDB::bind_method(godot::D_METHOD("highlight_path", "path"), &InteractiveGrid3D::highlight_path);
 
 	// --- Grid position
 
-	godot::ClassDB::bind_method(godot::D_METHOD("center", "center_position"), &InteractiveGrid::center);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_cell_global_position", "cell_index"), &InteractiveGrid::get_cell_global_position);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_cell_index_from_global_position", "global_position"), &InteractiveGrid::get_cell_index_from_global_position);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_grid_center_global_position"), &InteractiveGrid::get_grid_center_global_position);
+	godot::ClassDB::bind_method(godot::D_METHOD("center", "center_position"), &InteractiveGrid3D::center);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_cell_global_position", "cell_index"), &InteractiveGrid3D::get_cell_global_position);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_cell_index_from_global_position", "global_position"), &InteractiveGrid3D::get_cell_index_from_global_position);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_grid_center_global_position"), &InteractiveGrid3D::get_grid_center_global_position);
 
 	// --- Grid layout
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_layout", "value"), &InteractiveGrid::set_layout);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_layout"), &InteractiveGrid::get_layout);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_layout", "value"), &InteractiveGrid3D::set_layout);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_layout"), &InteractiveGrid3D::get_layout);
 
 	// --- Grid visibility
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_visible", "visible"), &InteractiveGrid::set_visible);
-	godot::ClassDB::bind_method(godot::D_METHOD("is_visible"), &InteractiveGrid::is_visible);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_visible", "visible"), &InteractiveGrid3D::set_visible);
+	godot::ClassDB::bind_method(godot::D_METHOD("is_visible"), &InteractiveGrid3D::is_visible);
 
-	godot::ClassDB::bind_method(godot::D_METHOD("compute_unreachable_cells", "start_cell_index"), &InteractiveGrid::compute_unreachable_cells);
-	godot::ClassDB::bind_method(godot::D_METHOD("hide_distant_cells", "start_cell_index", "distance"), &InteractiveGrid::hide_distant_cells);
+	godot::ClassDB::bind_method(godot::D_METHOD("compute_unreachable_cells", "start_cell_index"), &InteractiveGrid3D::compute_unreachable_cells);
+	godot::ClassDB::bind_method(godot::D_METHOD("hide_distant_cells", "start_cell_index", "distance"), &InteractiveGrid3D::hide_distant_cells);
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_hover_enabled", "enabled"), &InteractiveGrid::set_hover_enabled);
-	godot::ClassDB::bind_method(godot::D_METHOD("is_hover_enabled"), &InteractiveGrid::is_hover_enabled);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_hover_enabled", "enabled"), &InteractiveGrid3D::set_hover_enabled);
+	godot::ClassDB::bind_method(godot::D_METHOD("is_hover_enabled"), &InteractiveGrid3D::is_hover_enabled);
 
 	// --- Grid state
 
-	godot::ClassDB::bind_method(godot::D_METHOD("is_grid_created"), &InteractiveGrid::is_created);
-	godot::ClassDB::bind_method(godot::D_METHOD("reset_cells_state"), &InteractiveGrid::reset_cells_state);
+	godot::ClassDB::bind_method(godot::D_METHOD("is_grid_created"), &InteractiveGrid3D::is_created);
+	godot::ClassDB::bind_method(godot::D_METHOD("reset_cells_state"), &InteractiveGrid3D::reset_cells_state);
 
 	// --- Cell state
 
-	godot::ClassDB::bind_method(godot::D_METHOD("is_cell_walkable", "cell_index"), &InteractiveGrid::is_cell_walkable);
-	godot::ClassDB::bind_method(godot::D_METHOD("is_cell_reachable", "cell_index"), &InteractiveGrid::is_cell_reachable);
-	godot::ClassDB::bind_method(godot::D_METHOD("is_cell_hovered", "cell_index"), &InteractiveGrid::is_cell_hovered);
-	godot::ClassDB::bind_method(godot::D_METHOD("is_cell_selected", "cell_index"), &InteractiveGrid::is_cell_selected);
-	godot::ClassDB::bind_method(godot::D_METHOD("is_cell_visible", "cell_index"), &InteractiveGrid::is_cell_visible);
+	godot::ClassDB::bind_method(godot::D_METHOD("is_cell_walkable", "cell_index"), &InteractiveGrid3D::is_cell_walkable);
+	godot::ClassDB::bind_method(godot::D_METHOD("is_cell_reachable", "cell_index"), &InteractiveGrid3D::is_cell_reachable);
+	godot::ClassDB::bind_method(godot::D_METHOD("is_cell_hovered", "cell_index"), &InteractiveGrid3D::is_cell_hovered);
+	godot::ClassDB::bind_method(godot::D_METHOD("is_cell_selected", "cell_index"), &InteractiveGrid3D::is_cell_selected);
+	godot::ClassDB::bind_method(godot::D_METHOD("is_cell_visible", "cell_index"), &InteractiveGrid3D::is_cell_visible);
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_cell_walkable", "cell_index", "is_walkable"), &InteractiveGrid::set_cell_walkable);
-	godot::ClassDB::bind_method(godot::D_METHOD("set_cell_reachable", "cell_index", "set_cell_reachable"), &InteractiveGrid::set_cell_reachable);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_cell_walkable", "cell_index", "is_walkable"), &InteractiveGrid3D::set_cell_walkable);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_cell_reachable", "cell_index", "set_cell_reachable"), &InteractiveGrid3D::set_cell_reachable);
 
 	// --- Cell color
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_cell_color", "cell_index", "color"), &InteractiveGrid::set_cell_color);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_cell_color", "cell_index", "color"), &InteractiveGrid3D::set_cell_color);
 
 	// --- Masks
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_obstacles_collision_masks", "masks"), &InteractiveGrid::set_obstacles_collision_masks);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_obstacles_collision_masks"), &InteractiveGrid::get_obstacles_collision_masks);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_obstacles_collision_masks", "masks"), &InteractiveGrid3D::set_obstacles_collision_masks);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_obstacles_collision_masks"), &InteractiveGrid3D::get_obstacles_collision_masks);
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_grid_floor_collision_masks", "masks"), &InteractiveGrid::set_grid_floor_collision_masks);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_grid_floor_collision_masks"), &InteractiveGrid::get_grid_floor_collision_masks);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_grid_floor_collision_masks", "masks"), &InteractiveGrid3D::set_grid_floor_collision_masks);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_grid_floor_collision_masks"), &InteractiveGrid3D::get_grid_floor_collision_masks);
 
 	// --- Astar
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_movement", "value"), &InteractiveGrid::set_movement);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_movement"), &InteractiveGrid::get_movement);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_movement", "value"), &InteractiveGrid3D::set_movement);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_movement"), &InteractiveGrid3D::get_movement);
 
 	// --- User interaction
 
-	godot::ClassDB::bind_method(godot::D_METHOD("select_cell", "global_position"), &InteractiveGrid::select_cell);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_selected_cells"), &InteractiveGrid::get_selected_cells);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_latest_selected"), &InteractiveGrid::get_latest_selected);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_path", "start_cell_index", "target_cell_index"), &InteractiveGrid::get_path);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_neighbors", "cell_index"), &InteractiveGrid::get_neighbors);
+	godot::ClassDB::bind_method(godot::D_METHOD("select_cell", "global_position"), &InteractiveGrid3D::select_cell);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_selected_cells"), &InteractiveGrid3D::get_selected_cells);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_latest_selected"), &InteractiveGrid3D::get_latest_selected);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_path", "start_cell_index", "target_cell_index"), &InteractiveGrid3D::get_path);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_neighbors", "cell_index"), &InteractiveGrid3D::get_neighbors);
 
 	// --- Debug
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_print_logs_enabled", "enabled"), &InteractiveGrid::set_print_logs_enabled);
-	godot::ClassDB::bind_method(godot::D_METHOD("is_print_logs_enabled"), &InteractiveGrid::is_print_logs_enabled);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_print_logs_enabled", "enabled"), &InteractiveGrid3D::set_print_logs_enabled);
+	godot::ClassDB::bind_method(godot::D_METHOD("is_print_logs_enabled"), &InteractiveGrid3D::is_print_logs_enabled);
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_print_execution_time_enabled", "enabled"), &InteractiveGrid::set_print_execution_time_enabled);
-	godot::ClassDB::bind_method(godot::D_METHOD("is_print_execution_time_enabled"), &InteractiveGrid::is_print_execution_time_enabled);
+	godot::ClassDB::bind_method(godot::D_METHOD("set_print_execution_time_enabled", "enabled"), &InteractiveGrid3D::set_print_execution_time_enabled);
+	godot::ClassDB::bind_method(godot::D_METHOD("is_print_execution_time_enabled"), &InteractiveGrid3D::is_print_execution_time_enabled);
 
 	ADD_PROPERTY(godot::PropertyInfo(godot::Variant::INT, "_rows"), "set_rows", "get_rows");
 	ADD_PROPERTY(godot::PropertyInfo(godot::Variant::INT, "_columns"), "set_columns", "get_columns");
@@ -850,13 +850,13 @@ void InteractiveGrid::_bind_methods() {
 	ADD_PROPERTY(godot::PropertyInfo(godot::Variant::BOOL, "print_execution_time"), "set_print_execution_time_enabled", "is_print_execution_time_enabled");
 }
 
-InteractiveGrid::InteractiveGrid() {}
+InteractiveGrid3D::InteractiveGrid3D() {}
 
-InteractiveGrid::~InteractiveGrid() {
+InteractiveGrid3D::~InteractiveGrid3D() {
 	_destroy();
 }
 
-void InteractiveGrid::_ready(void) {
+void InteractiveGrid3D::_ready(void) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary:  Called when the node enters the scene tree for the first time.
 
@@ -864,7 +864,7 @@ void InteractiveGrid::_ready(void) {
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 }
 
-void InteractiveGrid::_physics_process(double p_delta) {
+void InteractiveGrid3D::_physics_process(double p_delta) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Called every frame. 'delta' is the elapsed time since the 
            previous frame.
@@ -880,7 +880,7 @@ void InteractiveGrid::_physics_process(double p_delta) {
 	}
 }
 
-void InteractiveGrid::set_rows(const unsigned int rows) {
+void InteractiveGrid3D::set_rows(const unsigned int rows) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the number of rows in the grid.
 
@@ -890,7 +890,7 @@ void InteractiveGrid::set_rows(const unsigned int rows) {
 	_destroy();
 }
 
-int InteractiveGrid::get_rows(void) const {
+int InteractiveGrid3D::get_rows(void) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the number of rows in the grid.
 
@@ -899,7 +899,7 @@ int InteractiveGrid::get_rows(void) const {
 	return data.rows;
 }
 
-void InteractiveGrid::set_columns(const unsigned int columns) {
+void InteractiveGrid3D::set_columns(const unsigned int columns) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the number of columns in the grid.
 
@@ -909,7 +909,7 @@ void InteractiveGrid::set_columns(const unsigned int columns) {
 	_destroy();
 }
 
-int InteractiveGrid::get_columns(void) const {
+int InteractiveGrid3D::get_columns(void) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the columns of rows in the grid.
 
@@ -918,7 +918,7 @@ int InteractiveGrid::get_columns(void) const {
 	return data.columns;
 }
 
-void InteractiveGrid::set_cell_size(const godot::Vector2 cell_size) {
+void InteractiveGrid3D::set_cell_size(const godot::Vector2 cell_size) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the size of each cell in the grid. The provided 
            value will be stored and used for grid layout.
@@ -929,7 +929,7 @@ void InteractiveGrid::set_cell_size(const godot::Vector2 cell_size) {
 	_destroy();
 }
 
-godot::Vector2 InteractiveGrid::get_cell_size(void) const {
+godot::Vector2 InteractiveGrid3D::get_cell_size(void) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the size of a single cell in the grid.
            This value is used to manage grid dimensions and cell 
@@ -940,7 +940,7 @@ godot::Vector2 InteractiveGrid::get_cell_size(void) const {
 	return data.cell_size;
 }
 
-void InteractiveGrid::set_cell_mesh(const godot::Ref<godot::Mesh> &p_mesh) {
+void InteractiveGrid3D::set_cell_mesh(const godot::Ref<godot::Mesh> &p_mesh) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the mesh used for each cell of the grid.
 
@@ -950,7 +950,7 @@ void InteractiveGrid::set_cell_mesh(const godot::Ref<godot::Mesh> &p_mesh) {
 	_destroy();
 }
 
-godot::Ref<godot::Mesh> InteractiveGrid::get_cell_mesh() const {
+godot::Ref<godot::Mesh> InteractiveGrid3D::get_cell_mesh() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary:  Returns the mesh used for each cell of the grid.
 
@@ -959,7 +959,7 @@ godot::Ref<godot::Mesh> InteractiveGrid::get_cell_mesh() const {
 	return data.cell_mesh;
 }
 
-void InteractiveGrid::set_movement(unsigned int value) {
+void InteractiveGrid3D::set_movement(unsigned int value) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the movement type used for pathfinding on the grid.
 
@@ -968,7 +968,7 @@ void InteractiveGrid::set_movement(unsigned int value) {
 	data.movement = value;
 }
 
-unsigned int InteractiveGrid::get_movement() const {
+unsigned int InteractiveGrid3D::get_movement() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the current movement type used for pathfinding on the
            grid.
@@ -978,7 +978,7 @@ unsigned int InteractiveGrid::get_movement() const {
 	return data.movement;
 }
 
-void InteractiveGrid::set_walkable_color(const godot::Color &p_color) {
+void InteractiveGrid3D::set_walkable_color(const godot::Color &p_color) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the walkable color for the grid.
 
@@ -988,7 +988,7 @@ void InteractiveGrid::set_walkable_color(const godot::Color &p_color) {
 	_destroy();
 }
 
-godot::Color InteractiveGrid::get_walkable_color() const {
+godot::Color InteractiveGrid3D::get_walkable_color() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the walkable color for the grid.
 
@@ -997,7 +997,7 @@ godot::Color InteractiveGrid::get_walkable_color() const {
 	return data.walkable_color;
 }
 
-void InteractiveGrid::set_unwalkable_color(const godot::Color &p_color) {
+void InteractiveGrid3D::set_unwalkable_color(const godot::Color &p_color) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the unwalkable color for the grid.
 
@@ -1007,7 +1007,7 @@ void InteractiveGrid::set_unwalkable_color(const godot::Color &p_color) {
 	_destroy();
 }
 
-godot::Color InteractiveGrid::get_unwalkable_color() const {
+godot::Color InteractiveGrid3D::get_unwalkable_color() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the unvalid color for the grid.
 
@@ -1016,7 +1016,7 @@ godot::Color InteractiveGrid::get_unwalkable_color() const {
 	return data.unwalkable_color;
 }
 
-void InteractiveGrid::set_unreachable_color(const godot::Color &p_color) {
+void InteractiveGrid3D::set_unreachable_color(const godot::Color &p_color) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the unreachable color for the grid.
 
@@ -1025,7 +1025,7 @@ void InteractiveGrid::set_unreachable_color(const godot::Color &p_color) {
 	data.unreachable_color = p_color;
 }
 
-godot::Color InteractiveGrid::get_unreachable_color() const {
+godot::Color InteractiveGrid3D::get_unreachable_color() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the unreachable color for the grid.
 
@@ -1034,7 +1034,7 @@ godot::Color InteractiveGrid::get_unreachable_color() const {
 	return data.unreachable_color;
 }
 
-void InteractiveGrid::set_selected_color(const godot::Color &p_color) {
+void InteractiveGrid3D::set_selected_color(const godot::Color &p_color) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the selected color for the grid.
 
@@ -1043,7 +1043,7 @@ void InteractiveGrid::set_selected_color(const godot::Color &p_color) {
 	data.selected_color = p_color;
 }
 
-godot::Color InteractiveGrid::get_selected_color() const {
+godot::Color InteractiveGrid3D::get_selected_color() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the selected color for the grid.
 
@@ -1052,7 +1052,7 @@ godot::Color InteractiveGrid::get_selected_color() const {
 	return data.selected_color;
 }
 
-void InteractiveGrid::set_path_color(const godot::Color &p_color) {
+void InteractiveGrid3D::set_path_color(const godot::Color &p_color) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the path color for the grid.
 
@@ -1061,7 +1061,7 @@ void InteractiveGrid::set_path_color(const godot::Color &p_color) {
 	data.path_color = p_color;
 }
 
-godot::Color InteractiveGrid::get_path_color() const {
+godot::Color InteractiveGrid3D::get_path_color() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the path color for the grid.
 
@@ -1070,7 +1070,7 @@ godot::Color InteractiveGrid::get_path_color() const {
 	return data.path_color;
 }
 
-void InteractiveGrid::set_hovered_color(const godot::Color &p_color) {
+void InteractiveGrid3D::set_hovered_color(const godot::Color &p_color) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the hovered color for the grid.
 
@@ -1079,7 +1079,7 @@ void InteractiveGrid::set_hovered_color(const godot::Color &p_color) {
 	data.hovered_color = p_color;
 }
 
-godot::Color InteractiveGrid::get_hovered_color() const {
+godot::Color InteractiveGrid3D::get_hovered_color() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the hovered color for the grid.
 
@@ -1088,7 +1088,7 @@ godot::Color InteractiveGrid::get_hovered_color() const {
 	return data.hovered_color;
 }
 
-void InteractiveGrid::set_material_override(const godot::Ref<godot::Material> &p_material) {
+void InteractiveGrid3D::set_material_override(const godot::Ref<godot::Material> &p_material) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the material override for the grid.
 
@@ -1098,7 +1098,7 @@ void InteractiveGrid::set_material_override(const godot::Ref<godot::Material> &p
 	_destroy();
 }
 
-godot::Ref<godot::Material> InteractiveGrid::get_material_override() const {
+godot::Ref<godot::Material> InteractiveGrid3D::get_material_override() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the material override for the grid.
 
@@ -1107,7 +1107,7 @@ godot::Ref<godot::Material> InteractiveGrid::get_material_override() const {
 	return data.material_override;
 }
 
-void InteractiveGrid::apply_default_material() {
+void InteractiveGrid3D::apply_default_material() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Creates and applies a default ShaderMaterial to the grid's
            MultiMeshInstance.
@@ -1153,7 +1153,7 @@ void InteractiveGrid::apply_default_material() {
 	}
 }
 
-void InteractiveGrid::highlight_on_hover(godot::Vector3 global_position) {
+void InteractiveGrid3D::highlight_on_hover(godot::Vector3 global_position) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Updates the hover highlight state based on the specified 
            global position. Identifies the corresponding cell, clears
@@ -1237,7 +1237,7 @@ void InteractiveGrid::highlight_on_hover(godot::Vector3 global_position) {
 	}
 }
 
-void InteractiveGrid::highlight_path(const godot::PackedInt64Array &p_path) {
+void InteractiveGrid3D::highlight_path(const godot::PackedInt64Array &p_path) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Highlights a given path on the grid by changing the color of 
            each cell along the path to the predefined _path_color.
@@ -1250,7 +1250,7 @@ void InteractiveGrid::highlight_path(const godot::PackedInt64Array &p_path) {
 	}
 }
 
-godot::Vector3 InteractiveGrid::get_cell_global_position(unsigned int cell_index) const {
+godot::Vector3 InteractiveGrid3D::get_cell_global_position(unsigned int cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the global world‑space position of the cell identified
            by index. The method fetches the cell’s Transform3D from the
@@ -1262,7 +1262,7 @@ godot::Vector3 InteractiveGrid::get_cell_global_position(unsigned int cell_index
 	return cell_global_position;
 }
 
-int InteractiveGrid::get_cell_index_from_global_position(godot::Vector3 global_position) {
+int InteractiveGrid3D::get_cell_index_from_global_position(godot::Vector3 global_position) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the linear index of the grid cell that is closest to
 		   the supplied world‑space position.
@@ -1360,7 +1360,7 @@ int InteractiveGrid::get_cell_index_from_global_position(godot::Vector3 global_p
 	return closest_index;
 }
 
-godot::Vector3 InteractiveGrid::get_grid_center_global_position() const {
+godot::Vector3 InteractiveGrid3D::get_grid_center_global_position() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the central position of the interactive grid in world
            coordinates.
@@ -1370,7 +1370,7 @@ godot::Vector3 InteractiveGrid::get_grid_center_global_position() const {
 	return data.grid_center_position;
 }
 
-void InteractiveGrid::center(godot::Vector3 center_position) {
+void InteractiveGrid3D::center(godot::Vector3 center_position) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Called to re-center the grid. This also resets the grid state.
 
@@ -1408,7 +1408,7 @@ void InteractiveGrid::center(godot::Vector3 center_position) {
 	}
 }
 
-void InteractiveGrid::set_layout(unsigned int value) {
+void InteractiveGrid3D::set_layout(unsigned int value) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	Summary: Sets the grid layout.
 
@@ -1418,7 +1418,7 @@ void InteractiveGrid::set_layout(unsigned int value) {
 	_destroy();
 }
 
-unsigned int InteractiveGrid::get_layout() const {
+unsigned int InteractiveGrid3D::get_layout() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	Summary: Returns the current grid layout.
 
@@ -1427,7 +1427,7 @@ unsigned int InteractiveGrid::get_layout() const {
 	return data.layout_index;
 }
 
-void InteractiveGrid::set_visible(bool visible) {
+void InteractiveGrid3D::set_visible(bool visible) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the visibility of the grid.
 
@@ -1451,7 +1451,7 @@ void InteractiveGrid::set_visible(bool visible) {
 	}
 }
 
-bool InteractiveGrid::is_visible() const {
+bool InteractiveGrid3D::is_visible() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Checks whether the grid is currently visible in the scene.
 
@@ -1460,7 +1460,7 @@ bool InteractiveGrid::is_visible() const {
 	return (data.flags & GFL_VISIBLE) != 0;
 }
 
-void InteractiveGrid::configure_astar() {
+void InteractiveGrid3D::configure_astar() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	Summary: // TODO
 
@@ -1502,7 +1502,7 @@ void InteractiveGrid::configure_astar() {
 	}
 }
 
-void InteractiveGrid::configure_astar_4_dir() {
+void InteractiveGrid3D::configure_astar_4_dir() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Configures the A* pathfinding graph for four directions movement.
            Each cell is connected to its four immediate neighbors (up, 
@@ -1545,7 +1545,7 @@ void InteractiveGrid::configure_astar_4_dir() {
 	}
 }
 
-void InteractiveGrid::configure_astar_6_dir() {
+void InteractiveGrid3D::configure_astar_6_dir() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	  Summary: Configures the A* pathfinding graph for six directions 
 	           movement (hexagonal grid). Each cell is connected to its 
@@ -1606,7 +1606,7 @@ void InteractiveGrid::configure_astar_6_dir() {
 	}
 }
 
-void InteractiveGrid::configure_astar_8_dir() {
+void InteractiveGrid3D::configure_astar_8_dir() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Configures the A* pathfinding graph for eight directions 
   		   movement. Each cell is connected to all eight neighboring 
@@ -1644,7 +1644,7 @@ void InteractiveGrid::configure_astar_8_dir() {
 	}
 }
 
-void InteractiveGrid::compute_unreachable_cells(unsigned int start_cell_index) {
+void InteractiveGrid3D::compute_unreachable_cells(unsigned int start_cell_index) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	Summary: Iterates over all grid cells and marks as unreachable those
            cells that cannot be reached from the specified start cell.
@@ -1677,7 +1677,7 @@ void InteractiveGrid::compute_unreachable_cells(unsigned int start_cell_index) {
 	}
 }
 
-void InteractiveGrid::breadth_first_search(unsigned int start_cell_index) {
+void InteractiveGrid3D::breadth_first_search(unsigned int start_cell_index) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	Summary: Performs a breadth-first search from a given start cell to 
 			 identify which walkable grid cells are reachable. This 
@@ -1741,7 +1741,7 @@ void InteractiveGrid::breadth_first_search(unsigned int start_cell_index) {
 	}
 }
 
-void InteractiveGrid::hide_distant_cells(unsigned int start_cell_index, float distance) {
+void InteractiveGrid3D::hide_distant_cells(unsigned int start_cell_index, float distance) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Iterates over all grid cells and hides those located farther 
            than the specified distance from the start cell. Marks them
@@ -1772,7 +1772,7 @@ void InteractiveGrid::hide_distant_cells(unsigned int start_cell_index, float di
 	}
 }
 
-void InteractiveGrid::set_hover_enabled(bool enabled) {
+void InteractiveGrid3D::set_hover_enabled(bool enabled) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	Summary: Enables or disables hover functionality on the grid.
 
@@ -1790,7 +1790,7 @@ void InteractiveGrid::set_hover_enabled(bool enabled) {
 	}
 }
 
-bool InteractiveGrid::is_hover_enabled() const {
+bool InteractiveGrid3D::is_hover_enabled() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Checks whether hover functionality is currently disabled
 	       on the grid.
@@ -1800,7 +1800,7 @@ bool InteractiveGrid::is_hover_enabled() const {
 	return (data.flags & GFL_HOVER_ENABLED) != 0;
 }
 
-bool InteractiveGrid::is_created() const {
+bool InteractiveGrid3D::is_created() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Checks if the grid has been created.
 
@@ -1809,7 +1809,7 @@ bool InteractiveGrid::is_created() const {
 	return (data.flags & GFL_CREATED) != 0;
 }
 
-bool InteractiveGrid::is_centered() const {
+bool InteractiveGrid3D::is_centered() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Checks whether the grid is currently centered. Returns true
 	       if the GFL_CENTERED flag is set, false otherwise.
@@ -1819,7 +1819,7 @@ bool InteractiveGrid::is_centered() const {
 	return (data.flags & GFL_CENTERED) != 0;
 }
 
-bool InteractiveGrid::is_cell_walkable(unsigned int cell_index) const {
+bool InteractiveGrid3D::is_cell_walkable(unsigned int cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns true if the cell at the specified index is currently 
            marked as walkable.
@@ -1829,7 +1829,7 @@ bool InteractiveGrid::is_cell_walkable(unsigned int cell_index) const {
 	return (data.cells.at(cell_index)->flags & CFL_WALKABLE) != 0;
 }
 
-bool InteractiveGrid::is_cell_reachable(unsigned int cell_index) const {
+bool InteractiveGrid3D::is_cell_reachable(unsigned int cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns true if the cell at the specified index is currently 
            marked as unreachable.
@@ -1839,7 +1839,7 @@ bool InteractiveGrid::is_cell_reachable(unsigned int cell_index) const {
 	return (data.cells.at(cell_index)->flags & CFL_REACHABLE) != 0;
 }
 
-bool InteractiveGrid::is_cell_in_void(unsigned int cell_index) const {
+bool InteractiveGrid3D::is_cell_in_void(unsigned int cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Checks whether a specific cell is marked as "in void".
 
@@ -1848,7 +1848,7 @@ bool InteractiveGrid::is_cell_in_void(unsigned int cell_index) const {
 	return (data.cells.at(cell_index)->flags & CFL_IN_VOID) != 0;
 }
 
-bool InteractiveGrid::is_cell_hovered(const unsigned int cell_index) const {
+bool InteractiveGrid3D::is_cell_hovered(const unsigned int cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns true if the cell at the specified index is currently 
            marked as hovered.
@@ -1858,7 +1858,7 @@ bool InteractiveGrid::is_cell_hovered(const unsigned int cell_index) const {
 	return (data.cells.at(cell_index)->flags & CFL_HOVERED) != 0;
 }
 
-bool InteractiveGrid::is_cell_selected(unsigned int cell_index) const {
+bool InteractiveGrid3D::is_cell_selected(unsigned int cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns true if the cell at the specified index is currently 
            marked as selected.
@@ -1868,7 +1868,7 @@ bool InteractiveGrid::is_cell_selected(unsigned int cell_index) const {
 	return (data.cells.at(cell_index)->flags & CFL_SELECTED) != 0;
 }
 
-bool InteractiveGrid::is_cell_on_path(unsigned int cell_index) const {
+bool InteractiveGrid3D::is_cell_on_path(unsigned int cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns true if the cell at the specified index is currently 
            marked as part of the path.
@@ -1878,7 +1878,7 @@ bool InteractiveGrid::is_cell_on_path(unsigned int cell_index) const {
 	return (data.cells.at(cell_index)->flags & CFL_PATH) != 0;
 }
 
-bool InteractiveGrid::is_cell_visible(unsigned int cell_index) const {
+bool InteractiveGrid3D::is_cell_visible(unsigned int cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns true if the cell at the specified index is currently
            marked as visible.
@@ -1888,7 +1888,7 @@ bool InteractiveGrid::is_cell_visible(unsigned int cell_index) const {
 	return (data.cells.at(cell_index)->flags & CFL_VISIBLE) != 0;
 }
 
-void InteractiveGrid::set_cell_walkable(unsigned int cell_index, bool is_walkable) {
+void InteractiveGrid3D::set_cell_walkable(unsigned int cell_index, bool is_walkable) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets whether a specific cell is walkable or not.
 
@@ -1907,7 +1907,7 @@ void InteractiveGrid::set_cell_walkable(unsigned int cell_index, bool is_walkabl
 	}
 }
 
-void InteractiveGrid::set_cell_reachable(unsigned int cell_index, bool is_reachable) {
+void InteractiveGrid3D::set_cell_reachable(unsigned int cell_index, bool is_reachable) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets whether a given grid cell is unreachable.
 
@@ -1925,7 +1925,7 @@ void InteractiveGrid::set_cell_reachable(unsigned int cell_index, bool is_reacha
 	}
 }
 
-void InteractiveGrid::set_cell_visible(unsigned int cell_index, bool is_visible) {
+void InteractiveGrid3D::set_cell_visible(unsigned int cell_index, bool is_visible) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the visibility of a grid cell identified by cell_index.
 
@@ -1947,7 +1947,7 @@ void InteractiveGrid::set_cell_visible(unsigned int cell_index, bool is_visible)
 	}
 }
 
-void InteractiveGrid::InteractiveGrid::reset_cells_state() {
+void InteractiveGrid3D::InteractiveGrid3D::reset_cells_state() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Resets the state of all cells in the grid to their default 
            flags.
@@ -1976,7 +1976,7 @@ void InteractiveGrid::InteractiveGrid::reset_cells_state() {
 	data.selected_cells.clear();
 }
 
-void InteractiveGrid::set_cell_color(unsigned int cell_index, const godot::Color &p_color) {
+void InteractiveGrid3D::set_cell_color(unsigned int cell_index, const godot::Color &p_color) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the color of a specific cell in the interactive grid.
 
@@ -1997,7 +1997,7 @@ void InteractiveGrid::set_cell_color(unsigned int cell_index, const godot::Color
 	}
 }
 
-void InteractiveGrid::set_obstacles_collision_masks(unsigned int masks) {
+void InteractiveGrid3D::set_obstacles_collision_masks(unsigned int masks) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the collision masks used by the interactive grid to 
            detect obstacles. These masks define which objects are 
@@ -2008,7 +2008,7 @@ void InteractiveGrid::set_obstacles_collision_masks(unsigned int masks) {
 	data.obstacles_collision_masks = masks;
 }
 
-int InteractiveGrid::get_obstacles_collision_masks() {
+int InteractiveGrid3D::get_obstacles_collision_masks() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the collision masks currently configured for obstacle 
            detection. These masks specify which objects are treated as 
@@ -2019,7 +2019,7 @@ int InteractiveGrid::get_obstacles_collision_masks() {
 	return data.obstacles_collision_masks;
 }
 
-void InteractiveGrid::set_grid_floor_collision_masks(unsigned int masks) {
+void InteractiveGrid3D::set_grid_floor_collision_masks(unsigned int masks) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the collision masks used by the interactive grid to 
            detect and align with scene floor (meshes).
@@ -2029,7 +2029,7 @@ void InteractiveGrid::set_grid_floor_collision_masks(unsigned int masks) {
 	data.floor_collision_masks = masks;
 }
 
-int InteractiveGrid::get_grid_floor_collision_masks() {
+int InteractiveGrid3D::get_grid_floor_collision_masks() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the collision masks currently configured for the 
            interactive grid alignment. These masks specify which floor
@@ -2041,7 +2041,7 @@ int InteractiveGrid::get_grid_floor_collision_masks() {
 	return data.floor_collision_masks;
 }
 
-void InteractiveGrid::select_cell(godot::Vector3 global_position) {
+void InteractiveGrid3D::select_cell(godot::Vector3 global_position) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Selects a grid cell based on a world‑space position.
 
@@ -2079,7 +2079,7 @@ void InteractiveGrid::select_cell(godot::Vector3 global_position) {
 	}
 }
 
-godot::Array InteractiveGrid::get_selected_cells() {
+godot::Array InteractiveGrid3D::get_selected_cells() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns an array of all cells currently marked as selected.
 
@@ -2088,7 +2088,7 @@ godot::Array InteractiveGrid::get_selected_cells() {
 	return data.selected_cells;
 }
 
-int InteractiveGrid::get_latest_selected() {
+int InteractiveGrid3D::get_latest_selected() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the most recently selected cell.
 
@@ -2097,7 +2097,7 @@ int InteractiveGrid::get_latest_selected() {
 	return data.selected_cells.back();
 }
 
-godot::PackedInt64Array InteractiveGrid::get_path(unsigned int start_cell_index, unsigned int target_cell_index) const {
+godot::PackedInt64Array InteractiveGrid3D::get_path(unsigned int start_cell_index, unsigned int target_cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Computes a path between two cells on the grid using A* 
            pathfinding.
@@ -2130,7 +2130,7 @@ godot::PackedInt64Array InteractiveGrid::get_path(unsigned int start_cell_index,
 	return path;
 }
 
-godot::PackedInt64Array InteractiveGrid::get_neighbors(unsigned int cell_index) const {
+godot::PackedInt64Array InteractiveGrid3D::get_neighbors(unsigned int cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the indices of neighboring cells for the specified
            grid cell.
@@ -2140,7 +2140,7 @@ godot::PackedInt64Array InteractiveGrid::get_neighbors(unsigned int cell_index) 
 	return data.cells.at(cell_index)->neighbors;
 }
 
-void InteractiveGrid::set_print_logs_enabled(bool enabled) {
+void InteractiveGrid3D::set_print_logs_enabled(bool enabled) {
 	/*F+F+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Summary: // TODO
 
@@ -2149,7 +2149,7 @@ void InteractiveGrid::set_print_logs_enabled(bool enabled) {
 	_debug_options.print_logs_enabled = enabled;
 }
 
-bool InteractiveGrid::is_print_logs_enabled() const {
+bool InteractiveGrid3D::is_print_logs_enabled() const {
 	/*F+F+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Summary: // TODO
 
@@ -2158,7 +2158,7 @@ bool InteractiveGrid::is_print_logs_enabled() const {
 	return _debug_options.print_logs_enabled;
 }
 
-void InteractiveGrid::set_print_execution_time_enabled(bool enabled) {
+void InteractiveGrid3D::set_print_execution_time_enabled(bool enabled) {
 	/*F+F+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Summary: Enables or disables printing of execution time for debugging.
 
@@ -2167,7 +2167,7 @@ void InteractiveGrid::set_print_execution_time_enabled(bool enabled) {
 	_debug_options.print_execution_time_enabled = enabled;
 }
 
-bool InteractiveGrid::is_print_execution_time_enabled() const {
+bool InteractiveGrid3D::is_print_execution_time_enabled() const {
 	/*F+F+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Summary:  Returns whether execution time printing is currently 
 	          enabled.
@@ -2177,7 +2177,7 @@ bool InteractiveGrid::is_print_execution_time_enabled() const {
 	return _debug_options.print_execution_time_enabled;
 }
 
-bool InteractiveGrid::is_cell_index_out_of_bounds(const godot::String &file, const godot::String &func, int line, unsigned int cell_index) {
+bool InteractiveGrid3D::is_cell_index_out_of_bounds(const godot::String &file, const godot::String &func, int line, unsigned int cell_index) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Checks whether the specified cell index exceeds the valid 
            grid bounds.

@@ -6,7 +6,7 @@ reloadable = true
 
 [icons]
 
-InteractiveGrid = "res://data/editor/icons/InteractiveGrid3D.svg"
+InteractiveGrid3D = "res://data/editor/icons/InteractiveGrid3D.svg"
 
 [libraries]
 ; Relative paths ensure that our GDExtension can be placed anywhere in the project directory.

@@ -16,7 +16,7 @@
 # Author: Antoine Charruel
 # =================================================================================================
 
-extends InteractiveGrid
+extends InteractiveGrid3D
 
 @onready var pawn_player: CharacterBody3D = $"../PawnPlayer"
 @onready var player_pawn_collision_shape_3d: CollisionShape3D = $"../PawnPlayer/PlayerPawnCollisionShape3D"
