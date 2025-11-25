@@ -165,7 +165,6 @@ private:
 		// Material.
 
 		godot::Ref<godot::Material> material_override;
-		bool alpha_pass{ false };
 
 		// Scan environnement.
 
@@ -232,10 +231,6 @@ public:
 	// Color displayed when hovering over a cell with the mouse
 	void set_hovered_color(const godot::Color &p_color);
 	godot::Color get_hovered_color() const;
-
-	// Enables passing cell bitflags through the alpha channel
-	void enable_alpha_pass(bool enabled);
-	bool is_alpha_pass_enabled() const;
 
 	// --- Grid materials
 

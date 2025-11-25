@@ -595,6 +595,7 @@ void InteractiveGrid::_apply_material(const godot::Ref<godot::Material> &p_mater
 	}
 
 	if (p_material.is_null()) {
+
 		// No material provided; clearing existing material override and applying default material
 		data.multimesh_instance->set_material_override(nullptr);
 		apply_default_material();
@@ -748,9 +749,6 @@ void InteractiveGrid::_bind_methods() {
 	godot::ClassDB::bind_method(godot::D_METHOD("set_hovered_color"), &InteractiveGrid::set_hovered_color);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_hovered_color"), &InteractiveGrid::get_hovered_color);
 
-	godot::ClassDB::bind_method(godot::D_METHOD("enable_alpha_pass", "enabled"), &InteractiveGrid::enable_alpha_pass);
-	godot::ClassDB::bind_method(godot::D_METHOD("is_alpha_pass_enabled"), &InteractiveGrid::is_alpha_pass_enabled);
-
 	// --- Grid materials
 
 	godot::ClassDB::bind_method(godot::D_METHOD("get_material_override"), &InteractiveGrid::get_material_override);
@@ -843,7 +841,6 @@ void InteractiveGrid::_bind_methods() {
 	ADD_PROPERTY(godot::PropertyInfo(godot::Variant::COLOR, "selected color"), "set_selected_color", "get_selected_color");
 	ADD_PROPERTY(godot::PropertyInfo(godot::Variant::COLOR, "path color"), "set_path_color", "get_path_color");
 	ADD_PROPERTY(godot::PropertyInfo(godot::Variant::COLOR, "hovered color"), "set_hovered_color", "get_hovered_color");
-	ADD_PROPERTY(godot::PropertyInfo(godot::Variant::BOOL, "enable_alpha_pass"), "enable_alpha_pass", "is_alpha_pass_enabled");
 	ADD_PROPERTY(godot::PropertyInfo(godot::Variant::OBJECT, "_material_override", godot::PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_material_override", "get_material_override");
 	ADD_PROPERTY(godot::PropertyInfo(godot::Variant::INT, "layout", godot::PROPERTY_HINT_ENUM, "SQUARE, HEXAGONAL"), "set_layout", "get_layout");
 	ADD_PROPERTY(godot::PropertyInfo(godot::Variant::INT, "obstacles_collision_masks", godot::PROPERTY_HINT_LAYERS_3D_RENDER), "set_obstacles_collision_masks", "get_obstacles_collision_masks");
@@ -1089,29 +1086,6 @@ godot::Color InteractiveGrid::get_hovered_color() const {
   Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.hovered_color;
-}
-
-void InteractiveGrid::enable_alpha_pass(bool enabled) {
-	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-  Summary: Enables passing cell bitflags through the alpha channel.
-           Can be used within shader scripts to modify rendering
-		   behavior.
-
-  Last Modified: November 23, 2025
-  M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	data.alpha_pass = enabled;
-	_destroy();
-}
-
-bool InteractiveGrid::is_alpha_pass_enabled() const {
-	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-  Summary: Returns whether alpha pass for cell bitflags is currently 
-           enabled. Used to check if cell bitflags are transmitted 
-		   through the alpha channel.
-
-  Last Modified: October 12, 2025
-  M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return data.alpha_pass;
 }
 
 void InteractiveGrid::set_material_override(const godot::Ref<godot::Material> &p_material) {
@@ -2012,7 +1986,7 @@ void InteractiveGrid::set_cell_color(unsigned int cell_index, const godot::Color
 		return; // !Exit
 	}
 
-	if (data.alpha_pass) {
+	if (data.material_override.is_valid()) {
 		uint32_t cell_flags = data.cells.at(cell_index)->flags;
 		godot::Color new_cell_color{ p_color.r, p_color.g, p_color.b, static_cast<float>(cell_flags) };
 		data.cells.at(cell_index)->color = new_cell_color;
