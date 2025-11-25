@@ -5,12 +5,12 @@ Summary: InteractiveGrid3D is a Godot 4.5 GDExtension that allows player
          interaction with a 3D grid, including cell selection,
 		 pathfinding, and hover highlights.
 
-Last Modified: November 23, 2025
+Last Modified: November 25, 2025
 
 This file is part of the InteractiveGrid3D GDExtension Source Code.
 Repository: https://github.com/antoinecharruel/interactive_grid
 
-Version InteractiveGrid3D: 1.4.0
+Version InteractiveGrid3D: 1.5.0
 Version: Godot Engine v4.5.stable.steam - https://godotengine.org
 
 Author: Antoine Charruel
@@ -21,8 +21,6 @@ Author: Antoine Charruel
 void InteractiveGrid3D::_create() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Initializes the grid if it has not been created yet.
-
-  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (!(data.flags & GFL_CREATED)) {
 		data.grid_center_position = get_global_transform().origin;
@@ -45,8 +43,6 @@ void InteractiveGrid3D::_create() {
 void InteractiveGrid3D::_destroy() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Frees all grid resources and resets state.
-
-  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (data.flags & GFL_CREATED) {
 		// Destroy cells
@@ -78,8 +74,6 @@ void InteractiveGrid3D::_init_multi_mesh() {
   MultiMesh: "Provides high-performance drawing of a mesh multiple times
 		     using GPU instancing."
 		https://docs.godotengine.org/fr/4.x/classes/class_multimesh.html#
-
-  Last Modified: November 21, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
 	// Create the MultiMeshInstance3D
@@ -133,8 +127,6 @@ void InteractiveGrid3D::_init_astar() {
   Summary: Initializes the A* pathfinding instance by creating a new 
            AStar2D object. Must be called before configuring points or
 		   calculating paths.
-
-  Last Modified: September 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.astar.instantiate(); // Create the AStar2D instance
 }
@@ -143,8 +135,6 @@ void InteractiveGrid3D::_layout(godot::Vector3 center_position) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Positions the cells around the center according to the 
            selected layout.
-
-  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
 	if (!(data.flags & GFL_CREATED)) {
@@ -166,8 +156,6 @@ void InteractiveGrid3D::_layout_cells_as_square_grid(godot::Vector3 center_posit
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: This method arranges the cells of the grid into a 
            square grid layout, positioning each cell relative to a pawn.
-
-  Last Modified: November 21, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.grid_center_position = center_position;
 
@@ -229,8 +217,6 @@ void InteractiveGrid3D::_layout_cells_as_hexagonal_grid(godot::Vector3 center_po
 
   		Patel, A. J. (2013). Hexagonal grids. 
   		https://www.redblobgames.com/grids/hexagons/#neighbors
-
-  Last Modified: October 21, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.grid_center_position = center_position;
 
@@ -305,8 +291,6 @@ void InteractiveGrid3D::_align_cells_with_floor() {
   Ref : BornCG. (2024, August 4). Godot 4 3D Platformer Lesson #13: 
   		Align Player with Ground! [Video]. YouTube.
 		https://www.youtube.com/watch?v=Y5OiChOukfg
-
-  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
 	if (data.flags & GFL_CREATED) {
@@ -462,8 +446,6 @@ void InteractiveGrid3D::_scan_environnement_obstacles() {
 		   marked as invalid (unwalkable), while cells without collisions 
 		   are marked as valid (walkable). Debug logs are generated to 
 		   provide information about the collision results.
-
-  Last Modified: November 21, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (!(data.flags & GFL_VISIBLE)) {
 		return;
@@ -586,8 +568,6 @@ void InteractiveGrid3D::_apply_material(const godot::Ref<godot::Material> &p_mat
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Applies the supplied material as an override to the grid’s
            MultiMeshInstance
-
-  Last Modified: October 05, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (data.multimesh_instance == nullptr) {
 		PrintError(__FILE__, __FUNCTION__, __LINE__, "No MultiMeshInstance found.");
@@ -595,7 +575,6 @@ void InteractiveGrid3D::_apply_material(const godot::Ref<godot::Material> &p_mat
 	}
 
 	if (p_material.is_null()) {
-
 		// No material provided; clearing existing material override and applying default material
 		data.multimesh_instance->set_material_override(nullptr);
 		apply_default_material();
@@ -608,8 +587,6 @@ void InteractiveGrid3D::_apply_material(const godot::Ref<godot::Material> &p_mat
 void InteractiveGrid3D::_set_cells_visible(bool visible) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Toggles the visual visibility of every cell in the grid.
-
-  Last Modified: October 09, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	int cell_count = data.multimesh->get_instance_count();
 
@@ -635,8 +612,6 @@ void InteractiveGrid3D::_set_cell_in_void(unsigned int cell_index, bool is_in_vo
   Summary: Marks a cell as being "in void" or not. If a cell is in void,
 	       it is hidden and flagged accordingly. Used to prevent cells
 	       above empty space.
-
-  Last Modified: October 10, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (is_cell_index_out_of_bounds(__FILE__, __FUNCTION__, __LINE__, cell_index)) {
 		return; // !Exit
@@ -653,8 +628,6 @@ void InteractiveGrid3D::_set_cell_in_void(unsigned int cell_index, bool is_in_vo
 void InteractiveGrid3D::_set_cell_hovered(unsigned int cell_index, bool is_hovered) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets whether a particular grid cell (cell_index) is hovered.
-
-  Last Modified: October 07, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (is_cell_index_out_of_bounds(__FILE__, __FUNCTION__, __LINE__, cell_index)) {
 		return; // !Exit
@@ -672,8 +645,6 @@ void InteractiveGrid3D::_set_cell_selected(unsigned int cell_index, bool is_sele
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets whether a specific grid cell (cell_index) is marked as 
            selected.
-
-  Last Modified: October 07, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (is_cell_index_out_of_bounds(__FILE__, __FUNCTION__, __LINE__, cell_index)) {
 		return; // !Exit
@@ -691,8 +662,6 @@ void InteractiveGrid3D::_set_cell_on_path(unsigned int cell_index, bool is_on_pa
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets whether a specific grid cell (cell_index) is part of the 
            current path.
-
-  Last Modified: October 11, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (is_cell_index_out_of_bounds(__FILE__, __FUNCTION__, __LINE__, cell_index)) {
 		return; // !Exit
@@ -711,8 +680,6 @@ void InteractiveGrid3D::_bind_methods() {
 	Summary: _bind_methods, is a static function that Godot will call to 
 				find out which methods can be called and which properties it
 				exposes.
-
-	Last Modified: November 20, 2025
 	-----------------------------------------------------------------F-F*/
 
 	// --- Grid dimensions
@@ -859,8 +826,6 @@ InteractiveGrid3D::~InteractiveGrid3D() {
 void InteractiveGrid3D::_ready(void) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary:  Called when the node enters the scene tree for the first time.
-
-  Last Modified: September 19, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 }
 
@@ -868,8 +833,6 @@ void InteractiveGrid3D::_physics_process(double p_delta) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Called every frame. 'delta' is the elapsed time since the 
            previous frame.
-
-  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	_create(); // Create the grid at startup
 
@@ -883,8 +846,6 @@ void InteractiveGrid3D::_physics_process(double p_delta) {
 void InteractiveGrid3D::set_rows(const unsigned int rows) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the number of rows in the grid.
-
-  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.rows = rows;
 	_destroy();
@@ -893,8 +854,6 @@ void InteractiveGrid3D::set_rows(const unsigned int rows) {
 int InteractiveGrid3D::get_rows(void) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the number of rows in the grid.
-
-  Last Modified: April 29, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.rows;
 }
@@ -902,8 +861,6 @@ int InteractiveGrid3D::get_rows(void) const {
 void InteractiveGrid3D::set_columns(const unsigned int columns) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the number of columns in the grid.
-
-  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.columns = columns;
 	_destroy();
@@ -912,8 +869,6 @@ void InteractiveGrid3D::set_columns(const unsigned int columns) {
 int InteractiveGrid3D::get_columns(void) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the columns of rows in the grid.
-
-  Last Modified: April 29, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.columns;
 }
@@ -922,8 +877,6 @@ void InteractiveGrid3D::set_cell_size(const godot::Vector2 cell_size) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the size of each cell in the grid. The provided 
            value will be stored and used for grid layout.
-
-  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.cell_size = cell_size;
 	_destroy();
@@ -934,8 +887,6 @@ godot::Vector2 InteractiveGrid3D::get_cell_size(void) const {
   Summary: Returns the size of a single cell in the grid.
            This value is used to manage grid dimensions and cell 
 		   positioning.
-
-  Last Modified: May 03, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.cell_size;
 }
@@ -943,8 +894,6 @@ godot::Vector2 InteractiveGrid3D::get_cell_size(void) const {
 void InteractiveGrid3D::set_cell_mesh(const godot::Ref<godot::Mesh> &p_mesh) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the mesh used for each cell of the grid.
-
-  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.cell_mesh = p_mesh;
 	_destroy();
@@ -953,8 +902,6 @@ void InteractiveGrid3D::set_cell_mesh(const godot::Ref<godot::Mesh> &p_mesh) {
 godot::Ref<godot::Mesh> InteractiveGrid3D::get_cell_mesh() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary:  Returns the mesh used for each cell of the grid.
-
-  Last Modified: September 29, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.cell_mesh;
 }
@@ -962,8 +909,6 @@ godot::Ref<godot::Mesh> InteractiveGrid3D::get_cell_mesh() const {
 void InteractiveGrid3D::set_movement(unsigned int value) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the movement type used for pathfinding on the grid.
-
-  Last Modified: September 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.movement = value;
 }
@@ -972,8 +917,6 @@ unsigned int InteractiveGrid3D::get_movement() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the current movement type used for pathfinding on the
            grid.
-
-  Last Modified: September 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.movement;
 }
@@ -981,8 +924,6 @@ unsigned int InteractiveGrid3D::get_movement() const {
 void InteractiveGrid3D::set_walkable_color(const godot::Color &p_color) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the walkable color for the grid.
-
-  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.walkable_color = p_color;
 	_destroy();
@@ -991,8 +932,6 @@ void InteractiveGrid3D::set_walkable_color(const godot::Color &p_color) {
 godot::Color InteractiveGrid3D::get_walkable_color() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the walkable color for the grid.
-
-  Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.walkable_color;
 }
@@ -1000,8 +939,6 @@ godot::Color InteractiveGrid3D::get_walkable_color() const {
 void InteractiveGrid3D::set_unwalkable_color(const godot::Color &p_color) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the unwalkable color for the grid.
-
-  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.unwalkable_color = p_color;
 	_destroy();
@@ -1010,8 +947,6 @@ void InteractiveGrid3D::set_unwalkable_color(const godot::Color &p_color) {
 godot::Color InteractiveGrid3D::get_unwalkable_color() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the unvalid color for the grid.
-
-  Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.unwalkable_color;
 }
@@ -1019,8 +954,6 @@ godot::Color InteractiveGrid3D::get_unwalkable_color() const {
 void InteractiveGrid3D::set_unreachable_color(const godot::Color &p_color) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the unreachable color for the grid.
-
-  Last Modified: November 20, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.unreachable_color = p_color;
 }
@@ -1028,8 +961,6 @@ void InteractiveGrid3D::set_unreachable_color(const godot::Color &p_color) {
 godot::Color InteractiveGrid3D::get_unreachable_color() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the unreachable color for the grid.
-
-  Last Modified: November 20, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.unreachable_color;
 }
@@ -1037,8 +968,6 @@ godot::Color InteractiveGrid3D::get_unreachable_color() const {
 void InteractiveGrid3D::set_selected_color(const godot::Color &p_color) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the selected color for the grid.
-
-  Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.selected_color = p_color;
 }
@@ -1046,8 +975,6 @@ void InteractiveGrid3D::set_selected_color(const godot::Color &p_color) {
 godot::Color InteractiveGrid3D::get_selected_color() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the selected color for the grid.
-
-  Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.selected_color;
 }
@@ -1055,8 +982,6 @@ godot::Color InteractiveGrid3D::get_selected_color() const {
 void InteractiveGrid3D::set_path_color(const godot::Color &p_color) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the path color for the grid.
-
-  Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.path_color = p_color;
 }
@@ -1064,8 +989,6 @@ void InteractiveGrid3D::set_path_color(const godot::Color &p_color) {
 godot::Color InteractiveGrid3D::get_path_color() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the path color for the grid.
-
-  Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.path_color;
 }
@@ -1073,8 +996,6 @@ godot::Color InteractiveGrid3D::get_path_color() const {
 void InteractiveGrid3D::set_hovered_color(const godot::Color &p_color) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the hovered color for the grid.
-
-  Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.hovered_color = p_color;
 }
@@ -1082,8 +1003,6 @@ void InteractiveGrid3D::set_hovered_color(const godot::Color &p_color) {
 godot::Color InteractiveGrid3D::get_hovered_color() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the hovered color for the grid.
-
-  Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.hovered_color;
 }
@@ -1091,8 +1010,6 @@ godot::Color InteractiveGrid3D::get_hovered_color() const {
 void InteractiveGrid3D::set_material_override(const godot::Ref<godot::Material> &p_material) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the material override for the grid.
-
-  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.material_override = p_material;
 	_destroy();
@@ -1101,8 +1018,6 @@ void InteractiveGrid3D::set_material_override(const godot::Ref<godot::Material> 
 godot::Ref<godot::Material> InteractiveGrid3D::get_material_override() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the material override for the grid.
-
-  Last Modified: April 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.material_override;
 }
@@ -1111,8 +1026,6 @@ void InteractiveGrid3D::apply_default_material() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Creates and applies a default ShaderMaterial to the grid's
            MultiMeshInstance.
-
-  Last Modified: November 21, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (data.multimesh_instance == nullptr) {
 		PrintError(__FILE__, __FUNCTION__, __LINE__, "No MultiMeshInstance found.");
@@ -1159,8 +1072,6 @@ void InteractiveGrid3D::highlight_on_hover(godot::Vector3 global_position) {
            global position. Identifies the corresponding cell, clears
 		   any previous hover, and applies the hover color unless the
 		   cell is already selected.
-
-  Last Modified: November 20, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
 	// If the grid isn’t visible, exit early
@@ -1241,8 +1152,6 @@ void InteractiveGrid3D::highlight_path(const godot::PackedInt64Array &p_path) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Highlights a given path on the grid by changing the color of 
            each cell along the path to the predefined _path_color.
-
-  Last Modified: October 11, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	for (int step = 0; step < p_path.size(); step++) {
 		int cell_index = p_path[step];
@@ -1255,8 +1164,6 @@ godot::Vector3 InteractiveGrid3D::get_cell_global_position(unsigned int cell_ind
   Summary: Returns the global world‑space position of the cell identified
            by index. The method fetches the cell’s Transform3D from the
            internal `_cells` array and extracts its origin component.
-
-  Last Modified: September 26, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	godot::Vector3 cell_global_position = data.cells.at(cell_index)->global_xform.origin;
 	return cell_global_position;
@@ -1266,8 +1173,6 @@ int InteractiveGrid3D::get_cell_index_from_global_position(godot::Vector3 global
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the linear index of the grid cell that is closest to
 		   the supplied world‑space position.
-
-  Last Modified: October 21, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (!(data.flags & GFL_CREATED)) {
 		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid has not been created.");
@@ -1364,8 +1269,6 @@ godot::Vector3 InteractiveGrid3D::get_grid_center_global_position() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the central position of the interactive grid in world
            coordinates.
-
-  Last Modified: September 29, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.grid_center_position;
 }
@@ -1373,8 +1276,6 @@ godot::Vector3 InteractiveGrid3D::get_grid_center_global_position() const {
 void InteractiveGrid3D::center(godot::Vector3 center_position) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Called to re-center the grid. This also resets the grid state.
-
-  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
 	if (!(data.flags & GFL_CREATED)) {
@@ -1411,8 +1312,6 @@ void InteractiveGrid3D::center(godot::Vector3 center_position) {
 void InteractiveGrid3D::set_layout(unsigned int value) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	Summary: Sets the grid layout.
-
-  	Last Modified: November 23, 2025
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.layout_index = value;
 	_destroy();
@@ -1421,8 +1320,6 @@ void InteractiveGrid3D::set_layout(unsigned int value) {
 unsigned int InteractiveGrid3D::get_layout() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	Summary: Returns the current grid layout.
-
-	Last Modified: October 05, 2025
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.layout_index;
 }
@@ -1430,8 +1327,6 @@ unsigned int InteractiveGrid3D::get_layout() const {
 void InteractiveGrid3D::set_visible(bool visible) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the visibility of the grid.
-
-  Last Modified: November 21, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (!(data.flags & GFL_CREATED)) {
 		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid has not been created");
@@ -1454,8 +1349,6 @@ void InteractiveGrid3D::set_visible(bool visible) {
 bool InteractiveGrid3D::is_visible() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Checks whether the grid is currently visible in the scene.
-
-  Last Modified: May 03, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return (data.flags & GFL_VISIBLE) != 0;
 }
@@ -1463,8 +1356,6 @@ bool InteractiveGrid3D::is_visible() const {
 void InteractiveGrid3D::configure_astar() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	Summary: // TODO
-
-	Last Modified: November 23, 2025
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (godot::Engine::get_singleton()->is_editor_hint()) {
 		return; // ! Exit
@@ -1507,8 +1398,6 @@ void InteractiveGrid3D::configure_astar_4_dir() {
   Summary: Configures the A* pathfinding graph for four directions movement.
            Each cell is connected to its four immediate neighbors (up, 
 		   down, left, right) if they exist.
-
-  Last Modified: October 09, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	for (int row = 0; row < data.rows; row++) {
 		for (int column = 0; column < data.columns; column++) {
@@ -1553,8 +1442,6 @@ void InteractiveGrid3D::configure_astar_6_dir() {
 
 	  Reference: Patel, A. J. (2013). Hexagonal grids. 
 	             https://www.redblobgames.com/grids/hexagons/#neighbors
-
-	  Last Modified: October 21, 2025
 	  M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	const int even_directions[6][2] = {
 		{ +1, 0 }, // East
@@ -1611,8 +1498,6 @@ void InteractiveGrid3D::configure_astar_8_dir() {
   Summary: Configures the A* pathfinding graph for eight directions 
   		   movement. Each cell is connected to all eight neighboring 
 		   cells if the neighbor is walkable.
-
-  Last Modified: October 09, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
 	// Create 8-direction connections
@@ -1653,8 +1538,6 @@ void InteractiveGrid3D::compute_unreachable_cells(unsigned int start_cell_index)
 			
 		   Unreachable cells are not marked as unwalkable to allow
 		   gameplay features such as teleportation.
-
-	Last Modified: Novenber 21, 2025
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (is_cell_index_out_of_bounds(__FILE__, __FUNCTION__, __LINE__, start_cell_index)) {
 		return; // !Exit
@@ -1683,8 +1566,6 @@ void InteractiveGrid3D::breadth_first_search(unsigned int start_cell_index) {
 			 identify which walkable grid cells are reachable. This 
 			 traversal ignores non-walkable (blocked) cells and marks
 			 only valid reachable tiles.
-
-	Last Modified: Novenber 20, 2025
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
 	struct BSFNode {
@@ -1746,8 +1627,6 @@ void InteractiveGrid3D::hide_distant_cells(unsigned int start_cell_index, float 
   Summary: Iterates over all grid cells and hides those located farther 
            than the specified distance from the start cell. Marks them
            as non-walkable.
-
-  Last Modified: October 09, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (is_cell_index_out_of_bounds(__FILE__, __FUNCTION__, __LINE__, start_cell_index)) {
 		return; // !Exit
@@ -1775,8 +1654,6 @@ void InteractiveGrid3D::hide_distant_cells(unsigned int start_cell_index, float 
 void InteractiveGrid3D::set_hover_enabled(bool enabled) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	Summary: Enables or disables hover functionality on the grid.
-
-	Last Modified: October 10, 2025
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (!(data.flags & GFL_CREATED)) {
 		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid has not been created");
@@ -1794,8 +1671,6 @@ bool InteractiveGrid3D::is_hover_enabled() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Checks whether hover functionality is currently disabled
 	       on the grid.
-
-  Last Modified: October 10, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return (data.flags & GFL_HOVER_ENABLED) != 0;
 }
@@ -1803,8 +1678,6 @@ bool InteractiveGrid3D::is_hover_enabled() const {
 bool InteractiveGrid3D::is_created() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Checks if the grid has been created.
-
-  Last Modified: May 03, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return (data.flags & GFL_CREATED) != 0;
 }
@@ -1813,8 +1686,6 @@ bool InteractiveGrid3D::is_centered() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Checks whether the grid is currently centered. Returns true
 	       if the GFL_CENTERED flag is set, false otherwise.
-
-  Last Modified: October 10, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return (data.flags & GFL_CENTERED) != 0;
 }
@@ -1823,8 +1694,6 @@ bool InteractiveGrid3D::is_cell_walkable(unsigned int cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns true if the cell at the specified index is currently 
            marked as walkable.
-
-  Last Modified: October 07, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return (data.cells.at(cell_index)->flags & CFL_WALKABLE) != 0;
 }
@@ -1833,8 +1702,6 @@ bool InteractiveGrid3D::is_cell_reachable(unsigned int cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns true if the cell at the specified index is currently 
            marked as unreachable.
-
-  Last Modified: November 20, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return (data.cells.at(cell_index)->flags & CFL_REACHABLE) != 0;
 }
@@ -1842,8 +1709,6 @@ bool InteractiveGrid3D::is_cell_reachable(unsigned int cell_index) const {
 bool InteractiveGrid3D::is_cell_in_void(unsigned int cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Checks whether a specific cell is marked as "in void".
-
-  Last Modified: October 10, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return (data.cells.at(cell_index)->flags & CFL_IN_VOID) != 0;
 }
@@ -1852,8 +1717,6 @@ bool InteractiveGrid3D::is_cell_hovered(const unsigned int cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns true if the cell at the specified index is currently 
            marked as hovered.
-
-  Last Modified: October 07, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return (data.cells.at(cell_index)->flags & CFL_HOVERED) != 0;
 }
@@ -1862,8 +1725,6 @@ bool InteractiveGrid3D::is_cell_selected(unsigned int cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns true if the cell at the specified index is currently 
            marked as selected.
-
-  Last Modified: October 07, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return (data.cells.at(cell_index)->flags & CFL_SELECTED) != 0;
 }
@@ -1872,8 +1733,6 @@ bool InteractiveGrid3D::is_cell_on_path(unsigned int cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns true if the cell at the specified index is currently 
            marked as part of the path.
-
-  Last Modified: October 11, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return (data.cells.at(cell_index)->flags & CFL_PATH) != 0;
 }
@@ -1882,8 +1741,6 @@ bool InteractiveGrid3D::is_cell_visible(unsigned int cell_index) const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns true if the cell at the specified index is currently
            marked as visible.
-
-  Last Modified: October 07, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return (data.cells.at(cell_index)->flags & CFL_VISIBLE) != 0;
 }
@@ -1891,8 +1748,6 @@ bool InteractiveGrid3D::is_cell_visible(unsigned int cell_index) const {
 void InteractiveGrid3D::set_cell_walkable(unsigned int cell_index, bool is_walkable) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets whether a specific cell is walkable or not.
-
-  Last Modified: October 07, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (is_cell_index_out_of_bounds(__FILE__, __FUNCTION__, __LINE__, cell_index)) {
 		return; // !Exit
@@ -1910,8 +1765,6 @@ void InteractiveGrid3D::set_cell_walkable(unsigned int cell_index, bool is_walka
 void InteractiveGrid3D::set_cell_reachable(unsigned int cell_index, bool is_reachable) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets whether a given grid cell is unreachable.
-
-  Last Modified: November 20, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (is_cell_index_out_of_bounds(__FILE__, __FUNCTION__, __LINE__, cell_index)) {
 		return; // !Exit
@@ -1928,8 +1781,6 @@ void InteractiveGrid3D::set_cell_reachable(unsigned int cell_index, bool is_reac
 void InteractiveGrid3D::set_cell_visible(unsigned int cell_index, bool is_visible) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the visibility of a grid cell identified by cell_index.
-
-  Last Modified: October 07, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (is_cell_index_out_of_bounds(__FILE__, __FUNCTION__, __LINE__, cell_index)) {
 		return; // !Exit
@@ -1951,8 +1802,6 @@ void InteractiveGrid3D::InteractiveGrid3D::reset_cells_state() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Resets the state of all cells in the grid to their default 
            flags.
-
-  Last Modified: November 23, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
 	if (!(data.flags & GFL_CREATED)) {
@@ -1979,8 +1828,6 @@ void InteractiveGrid3D::InteractiveGrid3D::reset_cells_state() {
 void InteractiveGrid3D::set_cell_color(unsigned int cell_index, const godot::Color &p_color) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the color of a specific cell in the interactive grid.
-
-  Last Modified: October 11, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (is_cell_index_out_of_bounds(__FILE__, __FUNCTION__, __LINE__, cell_index)) {
 		return; // !Exit
@@ -2002,8 +1849,6 @@ void InteractiveGrid3D::set_obstacles_collision_masks(unsigned int masks) {
   Summary: Sets the collision masks used by the interactive grid to 
            detect obstacles. These masks define which objects are 
 		   considered as obstacles when checking for collisions.
-
-  Last Modified: September 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.obstacles_collision_masks = masks;
 }
@@ -2013,8 +1858,6 @@ int InteractiveGrid3D::get_obstacles_collision_masks() {
   Summary: Returns the collision masks currently configured for obstacle 
            detection. These masks specify which objects are treated as 
            obstacles by the interactive grid.
-
-  Last Modified: September 30, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.obstacles_collision_masks;
 }
@@ -2023,8 +1866,6 @@ void InteractiveGrid3D::set_grid_floor_collision_masks(unsigned int masks) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Sets the collision masks used by the interactive grid to 
            detect and align with scene floor (meshes).
-
-  Last Modified: October 04, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.floor_collision_masks = masks;
 }
@@ -2035,8 +1876,6 @@ int InteractiveGrid3D::get_grid_floor_collision_masks() {
            interactive grid alignment. These masks specify which floor
 		   are used as references when aligning grid cells with meshes in 
 		   the scene
-
-  Last Modified: October 04, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.floor_collision_masks;
 }
@@ -2044,8 +1883,6 @@ int InteractiveGrid3D::get_grid_floor_collision_masks() {
 void InteractiveGrid3D::select_cell(godot::Vector3 global_position) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Selects a grid cell based on a world‑space position.
-
-  Last Modified: November 20, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
 	// If the grid isn’t visible, exit early
@@ -2082,8 +1919,6 @@ void InteractiveGrid3D::select_cell(godot::Vector3 global_position) {
 godot::Array InteractiveGrid3D::get_selected_cells() {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns an array of all cells currently marked as selected.
-
-  Last Modified: September 26, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.selected_cells;
 }
@@ -2105,8 +1940,6 @@ godot::PackedInt64Array InteractiveGrid3D::get_path(unsigned int start_cell_inde
            Sets up all grid points with their walkable state and 
 		   configures the A* algorithm according to the selected movement
 		   type (orthogonal or diagonal).
-
-  Last Modified: October 21, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
 	godot::PackedInt64Array path;
@@ -2134,46 +1967,36 @@ godot::PackedInt64Array InteractiveGrid3D::get_neighbors(unsigned int cell_index
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Returns the indices of neighboring cells for the specified
            grid cell.
-
-  Last Modified: November 20, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return data.cells.at(cell_index)->neighbors;
 }
 
 void InteractiveGrid3D::set_print_logs_enabled(bool enabled) {
-	/*F+F+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
     Summary: // TODO
-
-    Last Modified: November 21, 2025
-  -----------------------------------------------------------------F-F*/
+  M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	_debug_options.print_logs_enabled = enabled;
 }
 
 bool InteractiveGrid3D::is_print_logs_enabled() const {
-	/*F+F+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
     Summary: // TODO
-
-    Last Modified: November 21, 2025
-  -----------------------------------------------------------------F-F*/
+  M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return _debug_options.print_logs_enabled;
 }
 
 void InteractiveGrid3D::set_print_execution_time_enabled(bool enabled) {
-	/*F+F+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
     Summary: Enables or disables printing of execution time for debugging.
-
-    Last Modified: November 19, 2025
-  -----------------------------------------------------------------F-F*/
+  M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	_debug_options.print_execution_time_enabled = enabled;
 }
 
 bool InteractiveGrid3D::is_print_execution_time_enabled() const {
-	/*F+F+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
     Summary:  Returns whether execution time printing is currently 
 	          enabled.
-
-    Last Modified: November 19, 2025
-  -----------------------------------------------------------------F-F*/
+  M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return _debug_options.print_execution_time_enabled;
 }
 
@@ -2181,8 +2004,6 @@ bool InteractiveGrid3D::is_cell_index_out_of_bounds(const godot::String &file, c
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: Checks whether the specified cell index exceeds the valid 
            grid bounds.
-
-  Last Modified: November 24, 2025
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	bool is_out_of_bounds = false;
 	unsigned int grid_size = data.rows * data.columns;

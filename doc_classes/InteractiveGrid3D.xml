@@ -4,7 +4,6 @@
 		InteractiveGrid3D is Node that allows player interaction with a 3D grid, including cell selection, pathfinding, and hover highlights.
 	</brief_description>
 	<description>
-		— Highlight cells when hovering the mouse over them.
 		— Select individual cells.
 		— Detect obstacles (collision mask configurable from the editor).
 		— Align cells with the floor (collision mask configurable from the editor).
