@@ -55,3 +55,7 @@ web.wasm32.single.debug = "./web/libinteractive_grid.web.template_debug.wasm32.n
 web.wasm32.double.debug = "./web/libinteractive_grid.web.template_release.wasm32.double.nothreads.wasm"
 web.wasm32.single.release = "./web/libinteractive_grid.web.template_release.wasm32.nothreads.wasm"
 web.wasm32.double.release = "./web/libinteractive_grid.web.template_release.wasm32.double.nothreads.wasm"
+
+[icons]
+
+InteractiveGrid = "res://addons/interactive-grid/data/editor/icons/InteractiveGrid3D.svg"
