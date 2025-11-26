@@ -28,7 +28,7 @@ void InteractiveGrid3D::_create() {
 		_init_multi_mesh();
 		_init_astar();
 
-		data.flags |= GFL_CREATED; // Mark as created to avoid duplication
+		data.flags |= GFL_CREATED;
 
 		center(data.grid_center_position);
 
@@ -45,13 +45,13 @@ void InteractiveGrid3D::_delete() {
   Summary: Frees all grid resources and resets state.
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (data.flags & GFL_CREATED) {
-		// Destroy cells
+		// Delete cells
 		for (Cell *c : data.cells) {
 			delete c;
 		}
 		data.cells.clear();
 
-		// Destroy multimesh
+		// Delete multimesh
 		if (data.multimesh_instance) {
 			data.multimesh_instance->queue_free();
 			data.multimesh_instance = nullptr;
@@ -82,8 +82,6 @@ void InteractiveGrid3D::_init_multi_mesh() {
 	data.multimesh.instantiate();
 
 	data.multimesh->set_transform_format(godot::MultiMesh::TRANSFORM_3D);
-
-	// Important: enable BEFORE setting instance_count
 	data.multimesh->set_use_custom_data(true);
 
 	int cell_count = data.columns * data.rows;
@@ -96,21 +94,20 @@ void InteractiveGrid3D::_init_multi_mesh() {
 	godot::Transform3D xform;
 	xform.origin = godot::Vector3(0, 0, 0);
 
-	// Iterate through the cells
 	for (int row = 0; row < data.rows; row++) {
 		for (int column = 0; column < data.columns; column++) {
 			const int index =
-					row * data.columns + column; // Index in the 2D array stored as 1D
+					row * data.columns + column;
 
 			// Position and color all cells
 			data.multimesh->set_instance_transform(index, xform);
 			data.multimesh->set_instance_custom_data(index, data.walkable_color);
 
 			// Save the metadata
-			data.cells.push_back(new Cell); // Init
-			data.cells.at(index)->index = index; // Init
-			data.cells.at(index)->local_xform = xform; // Init
-			data.cells.at(index)->global_xform = xform; // Init
+			data.cells.push_back(new Cell);
+			data.cells.at(index)->index = index;
+			data.cells.at(index)->local_xform = xform;
+			data.cells.at(index)->global_xform = xform;
 		}
 	}
 
@@ -128,7 +125,7 @@ void InteractiveGrid3D::_init_astar() {
            AStar2D object. Must be called before configuring points or
 		   calculating paths.
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	data.astar.instantiate(); // Create the AStar2D instance
+	data.astar.instantiate();
 }
 
 void InteractiveGrid3D::_layout(godot::Vector3 center_position) {
@@ -594,7 +591,7 @@ void InteractiveGrid3D::_set_cells_visible(bool visible) {
 	for (int row = 0; row < data.rows; row++) {
 		for (int column = 0; column < data.columns; column++) {
 			const int index =
-					row * data.columns + column; // Index in the 2D array stored as 1D
+					row * data.columns + column;
 
 			if (visible == true) {
 				data.multimesh->set_instance_custom_data(index, data.walkable_color); // Visible
@@ -920,7 +917,7 @@ void InteractiveGrid3D::_bind_methods() {
 				exposes.
 	-----------------------------------------------------------------F-F*/
 
-	// --- Grid dimensions
+	// Grid dimensions.
 
 	godot::ClassDB::bind_method(godot::D_METHOD("set_rows"), &InteractiveGrid3D::set_rows);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_rows"), &InteractiveGrid3D::get_rows);
@@ -934,7 +931,7 @@ void InteractiveGrid3D::_bind_methods() {
 	godot::ClassDB::bind_method(godot::D_METHOD("set_cell_mesh", "_cell_mesh"), &InteractiveGrid3D::set_cell_mesh);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_cell_mesh"), &InteractiveGrid3D::get_cell_mesh);
 
-	// --- Grid colors
+	// Grid colors.
 
 	godot::ClassDB::bind_method(godot::D_METHOD("set_walkable_color"), &InteractiveGrid3D::set_walkable_color);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_walkable_color"), &InteractiveGrid3D::get_walkable_color);
@@ -954,29 +951,32 @@ void InteractiveGrid3D::_bind_methods() {
 	godot::ClassDB::bind_method(godot::D_METHOD("set_hovered_color"), &InteractiveGrid3D::set_hovered_color);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_hovered_color"), &InteractiveGrid3D::get_hovered_color);
 
-	// --- Grid materials
+	// Grid materials.
 
 	godot::ClassDB::bind_method(godot::D_METHOD("get_material_override"), &InteractiveGrid3D::get_material_override);
 	godot::ClassDB::bind_method(godot::D_METHOD("set_material_override", "material"), &InteractiveGrid3D::set_material_override);
 
-	// --- Highlight (Surbillance)
+	// Highlight.
 
 	godot::ClassDB::bind_method(godot::D_METHOD("highlight_on_hover", "global_position"), &InteractiveGrid3D::highlight_on_hover);
 	godot::ClassDB::bind_method(godot::D_METHOD("highlight_path", "path"), &InteractiveGrid3D::highlight_path);
 
-	// --- Grid position
+	godot::ClassDB::bind_method(godot::D_METHOD("set_hover_enabled", "enabled"), &InteractiveGrid3D::set_hover_enabled);
+	godot::ClassDB::bind_method(godot::D_METHOD("is_hover_enabled"), &InteractiveGrid3D::is_hover_enabled);
+
+	// Grid position.
 
 	godot::ClassDB::bind_method(godot::D_METHOD("center", "center_position"), &InteractiveGrid3D::center);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_cell_global_position", "cell_index"), &InteractiveGrid3D::get_cell_global_position);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_cell_index_from_global_position", "global_position"), &InteractiveGrid3D::get_cell_index_from_global_position);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_grid_center_global_position"), &InteractiveGrid3D::get_grid_center_global_position);
 
-	// --- Grid layout
+	// Grid layout.
 
 	godot::ClassDB::bind_method(godot::D_METHOD("set_layout", "value"), &InteractiveGrid3D::set_layout);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_layout"), &InteractiveGrid3D::get_layout);
 
-	// --- Grid visibility
+	// Grid visibility.
 
 	godot::ClassDB::bind_method(godot::D_METHOD("set_visible", "visible"), &InteractiveGrid3D::set_visible);
 	godot::ClassDB::bind_method(godot::D_METHOD("is_visible"), &InteractiveGrid3D::is_visible);
@@ -984,15 +984,12 @@ void InteractiveGrid3D::_bind_methods() {
 	godot::ClassDB::bind_method(godot::D_METHOD("compute_unreachable_cells", "start_cell_index"), &InteractiveGrid3D::compute_unreachable_cells);
 	godot::ClassDB::bind_method(godot::D_METHOD("hide_distant_cells", "start_cell_index", "distance"), &InteractiveGrid3D::hide_distant_cells);
 
-	godot::ClassDB::bind_method(godot::D_METHOD("set_hover_enabled", "enabled"), &InteractiveGrid3D::set_hover_enabled);
-	godot::ClassDB::bind_method(godot::D_METHOD("is_hover_enabled"), &InteractiveGrid3D::is_hover_enabled);
-
-	// --- Grid state
+	// Grid state.
 
 	godot::ClassDB::bind_method(godot::D_METHOD("is_grid_created"), &InteractiveGrid3D::is_created);
 	godot::ClassDB::bind_method(godot::D_METHOD("reset_cells_state"), &InteractiveGrid3D::reset_cells_state);
 
-	// --- Cell state
+	// Cell state.
 
 	godot::ClassDB::bind_method(godot::D_METHOD("is_cell_walkable", "cell_index"), &InteractiveGrid3D::is_cell_walkable);
 	godot::ClassDB::bind_method(godot::D_METHOD("is_cell_reachable", "cell_index"), &InteractiveGrid3D::is_cell_reachable);
@@ -1003,11 +1000,11 @@ void InteractiveGrid3D::_bind_methods() {
 	godot::ClassDB::bind_method(godot::D_METHOD("set_cell_walkable", "cell_index", "is_walkable"), &InteractiveGrid3D::set_cell_walkable);
 	godot::ClassDB::bind_method(godot::D_METHOD("set_cell_reachable", "cell_index", "set_cell_reachable"), &InteractiveGrid3D::set_cell_reachable);
 
-	// --- Cell color
+	// Cell color.
 
 	godot::ClassDB::bind_method(godot::D_METHOD("set_cell_color", "cell_index", "color"), &InteractiveGrid3D::set_cell_color);
 
-	// --- Masks
+	// Masks.
 
 	godot::ClassDB::bind_method(godot::D_METHOD("set_obstacles_collision_masks", "masks"), &InteractiveGrid3D::set_obstacles_collision_masks);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_obstacles_collision_masks"), &InteractiveGrid3D::get_obstacles_collision_masks);
@@ -1015,12 +1012,12 @@ void InteractiveGrid3D::_bind_methods() {
 	godot::ClassDB::bind_method(godot::D_METHOD("set_grid_floor_collision_masks", "masks"), &InteractiveGrid3D::set_grid_floor_collision_masks);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_grid_floor_collision_masks"), &InteractiveGrid3D::get_grid_floor_collision_masks);
 
-	// --- Astar
+	// Astar.
 
 	godot::ClassDB::bind_method(godot::D_METHOD("set_movement", "value"), &InteractiveGrid3D::set_movement);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_movement"), &InteractiveGrid3D::get_movement);
 
-	// --- User interaction
+	// User interaction.
 
 	godot::ClassDB::bind_method(godot::D_METHOD("select_cell", "global_position"), &InteractiveGrid3D::select_cell);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_selected_cells"), &InteractiveGrid3D::get_selected_cells);
@@ -1028,7 +1025,7 @@ void InteractiveGrid3D::_bind_methods() {
 	godot::ClassDB::bind_method(godot::D_METHOD("get_path", "start_cell_index", "target_cell_index"), &InteractiveGrid3D::get_path);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_neighbors", "cell_index"), &InteractiveGrid3D::get_neighbors);
 
-	// --- Debug
+	// Debug.
 
 	godot::ClassDB::bind_method(godot::D_METHOD("set_print_logs_enabled", "enabled"), &InteractiveGrid3D::set_print_logs_enabled);
 	godot::ClassDB::bind_method(godot::D_METHOD("is_print_logs_enabled"), &InteractiveGrid3D::is_print_logs_enabled);
@@ -1312,12 +1309,10 @@ void InteractiveGrid3D::highlight_on_hover(godot::Vector3 global_position) {
 		   cell is already selected.
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-	// If the grid isn’t visible, exit early
 	if (is_visible() == false) {
 		return; // !Exit
 	}
 
-	// Do not hover if the grid is not centered
 	if (is_centered() == false) {
 		return; // !Exit
 	}
@@ -1343,12 +1338,12 @@ void InteractiveGrid3D::highlight_on_hover(godot::Vector3 global_position) {
 
 			data.hovered_cell_index = -1;
 		}
-		return;
+		return; // !Exit
 	}
 
 	// Already hovering over the same cell: nothing to do
 	if (closest_index == data.hovered_cell_index) {
-		return;
+		return; // !Exit
 	}
 
 	// Check whether the new cell is already selected
@@ -1370,13 +1365,13 @@ void InteractiveGrid3D::highlight_on_hover(godot::Vector3 global_position) {
 	// Skip non-walkable cells: only allow hovering on walkable cells
 	bool walkable = is_cell_walkable(closest_index);
 	if (!walkable) {
-		return;
+		return; // !Exit
 	}
 
 	// Skip unreachable cells
 	bool unreachable = !is_cell_reachable(closest_index);
 	if (unreachable) {
-		return;
+		return; // !Exit
 	}
 
 	// If the new cell is not selected, mark it as hovered
@@ -1660,9 +1655,9 @@ void InteractiveGrid3D::set_hover_enabled(bool enabled) {
 	}
 
 	if (enabled) {
-		data.flags |= GFL_HOVER_ENABLED; // Set the flag
+		data.flags |= GFL_HOVER_ENABLED;
 	} else {
-		data.flags &= ~GFL_HOVER_ENABLED; // Clear the flag
+		data.flags &= ~GFL_HOVER_ENABLED;
 	}
 }
 
@@ -1813,7 +1808,6 @@ void InteractiveGrid3D::InteractiveGrid3D::reset_cells_state() {
 		for (int column = 0; column < data.columns; column++) {
 			const int index = row * data.columns + column;
 			data.cells.at(index)->flags = 0; // Reset
-			//set_cell_visible(index, false);
 		}
 	}
 
@@ -1972,14 +1966,14 @@ godot::PackedInt64Array InteractiveGrid3D::get_neighbors(unsigned int cell_index
 
 void InteractiveGrid3D::set_print_logs_enabled(bool enabled) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-    Summary: // TODO
+    Summary: Enables or disables debug log printing.
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	_debug_options.print_logs_enabled = enabled;
 }
 
 bool InteractiveGrid3D::is_print_logs_enabled() const {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-    Summary: // TODO
+    Summary: Returns whether debug log printing is currently enabled.
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	return _debug_options.print_logs_enabled;
 }
