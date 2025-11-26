@@ -228,13 +228,11 @@ void fragment() {
 
 ## TODO
 
-- [ ] Allow choosing in the editor whether to render the grid with MultiMeshInstance3D or Decal nodes.
-- [ ] void clear_path(path).
+- [ ] Create InteractiveGrid2D.
 - [ ] Add vaultable cells.
   + [ ] A Define `CFL_VAULT` flag for cells that can be vaulted/climbed.
   + [ ] Assign vaultable cells to a specific collision layer checked by `scan_environnement_obstacles` method.
   + [ ] Add a visual indicator (color) for vaultable cells using `ADD_PROPERTY`.
-- [ ] Create InteractiveGrid2D.
 
 ## Need Help, Found an Issue, or Want to Share Your Work? 🛠️🎨
 
