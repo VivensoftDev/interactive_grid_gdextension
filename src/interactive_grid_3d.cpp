@@ -152,17 +152,18 @@ void InteractiveGrid3D::_layout(godot::Vector3 center_position) {
 void InteractiveGrid3D::_layout_cells_as_square_grid(godot::Vector3 center_position) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: This method arranges the cells of the grid into a 
-           square grid layout, positioning each cell relative to a pawn.
+           square grid layout, positioning each cell relative to a 
+		   center.
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	data.grid_center_position = center_position;
 
 	// Calculate the distances between the center and the grid's edges
-	const float pawn_to_grid_edge_x = (data.columns / 2) * data.cell_size.x;
-	const float pawn_to_grid_edge_z = (data.rows / 2) * data.cell_size.y;
+	const float center_to_grid_edge_x = (data.columns / 2) * data.cell_size.x;
+	const float center_to_grid_edge_z = (data.rows / 2) * data.cell_size.y;
 
 	//  Initialize the member `grid_offset_`
-	data.grid_offset.x = center_position.x - pawn_to_grid_edge_x;
-	data.grid_offset.z = center_position.z - pawn_to_grid_edge_z;
+	data.grid_offset.x = center_position.x - center_to_grid_edge_x;
+	data.grid_offset.z = center_position.z - center_to_grid_edge_z;
 
 	// Iterate through the cells
 	for (int row = 0; row < data.rows; row++) {
@@ -204,17 +205,17 @@ void InteractiveGrid3D::_layout_cells_as_square_grid(godot::Vector3 center_posit
 void InteractiveGrid3D::_layout_cells_as_hexagonal_grid(godot::Vector3 center_position) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Summary: This method arranges the cells of the grid into a 
-           hexagonal grid layout, positioning each cell relative to a pawn.
+           hexagonal grid layout, positioning each cell relative to a 
+		   center.
 
   ref : jmbiv. (2021, October 5). How to make a 3D hexagon grid in Godot
         (Tutorial) [Video]. YouTube. 
 		https://www.youtube.com/watch?v=3Lt2TfP8WEw
 
-        16:00 "building collumns in our grid"
+        16:00 "building columns in our grid"
 
   		Patel, A. J. (2013). Hexagonal grids. 
   		https://www.redblobgames.com/grids/hexagons/#neighbors
-
 
 		https://www.gigacalculator.com/calculators/hexagon-calculator.php
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
