@@ -24,8 +24,8 @@ collision_mask = 0
 [node name="TryMe" parent="." instance=ExtResource("4_2qaj2")]
 
 [node name="InteractiveGrid3D" type="InteractiveGrid3D" parent="."]
-_rows = 17
-_columns = 17
+_rows = 16
+_columns = 19
 cell_size = Vector2(1, 0.86)
 _cell_mesh = SubResource("CylinderMesh_dkjo2")
 _material_override = SubResource("ShaderMaterial_pbhab")

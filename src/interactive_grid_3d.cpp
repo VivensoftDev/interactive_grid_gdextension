@@ -214,55 +214,75 @@ void InteractiveGrid3D::_layout_cells_as_hexagonal_grid(godot::Vector3 center_po
 
   		Patel, A. J. (2013). Hexagonal grids. 
   		https://www.redblobgames.com/grids/hexagons/#neighbors
+
+
+		https://www.gigacalculator.com/calculators/hexagon-calculator.php
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	data.grid_center_position = center_position;
 
-	// Calculate the distances between the center and the grid's edges
-	const float pawn_to_grid_edge_x = (data.columns / 2) * data.cell_size.x;
-	const float pawn_to_grid_edge_z = (data.rows / 2) * data.cell_size.y;
+  	data.grid_center_position = center_position;
 
-	//  Initialize the member `grid_offset_`
-	data.grid_offset.x = center_position.x - pawn_to_grid_edge_x - data.cell_size.x / 2;
-	data.grid_offset.z = center_position.z - pawn_to_grid_edge_z - data.cell_size.y;
+	// The short diagonal (s) can be calculated using the formula: s = a · √3
+	const float hex_short_diagonal = data.cell_size.x; // s
 
-	// Iterate through the cells
+	// a = s / √3
+	const float hex_side_length = hex_short_diagonal / sqrt(3); // a
+
+	// Calculate the distances between the center and the grid's edges.
+	float center_to_grid_edge_x = (data.columns / 2) * data.cell_size.x;
+	float center_to_grid_edge_z = (data.rows / 2) * data.cell_size.y;
+
+	// Z-AXIS CORRECTION.
+	if (!(data.rows % 2)) {
+		// Vertex to opposite vertex.
+		center_to_grid_edge_z -= hex_side_length;
+	}
+
+	// X-AXIS CORRECTION.
+	if (!(data.columns % 2)) {
+		// Side to side.
+		center_to_grid_edge_x -= data.cell_size.x/2;
+	}
+
+	// Initialize the member `grid_offset_`.
+	data.grid_offset.x = center_position.x - center_to_grid_edge_x - data.cell_size.x / 2;
+	data.grid_offset.z = center_position.z - center_to_grid_edge_z - data.cell_size.y;
+
+	// Iterate through the cells.
 	for (int row = 0; row < data.rows; row++) {
 		for (int column = 0; column < data.columns; column++) {
-			const int index = row * data.columns + column; // Index in the 2D array stored as 1D
+			const int index = row * data.columns + column; // Index in the 2D array stored as 1D.
 
-			// Compute columns
+			// Compute columns.
 			float cell_pos_x{ 0.0f };
 
 			bool is_even_row = (row % 2) == 0;
 
-			if (is_even_row)
-				cell_pos_x = data.grid_offset.x + column * data.cell_size.x;
-			else
-				cell_pos_x = data.grid_offset.x + (data.cell_size.x / 2) + column * data.cell_size.x;
+			if (is_even_row) {
+				cell_pos_x = data.grid_offset.x + (column * data.cell_size.x);
+			}
+			else {
+				cell_pos_x = data.grid_offset.x + (column * data.cell_size.x) + (data.cell_size.x / 2);
+			}
 
-			// Compute height
+			// Apply final position.
 			float cell_pos_y = center_position.y;
-
-			// Compute rows
-			float cell_pos_z = data.grid_offset.z + row * data.cell_size.y + data.cell_size.y * godot::Math::cos(godot::Math::deg_to_rad(30.0f));
-
-			// Apply final position
+			float cell_pos_z = data.grid_offset.z + (row * data.cell_size.y) + data.cell_size.y;
 			godot::Vector3 cell_pos(cell_pos_x, cell_pos_y, cell_pos_z);
 
-			// Apply the position (global, not local)
+			// Apply the position (global, not local).
 			godot::Transform3D global_xform = data.multimesh_instance->get_global_transform();
 			godot::Transform3D local_xform = global_xform.affine_inverse(); // Inverse du global
 
 			// Convert the global position to local:
 			godot::Vector3 local_pos = local_xform.xform(cell_pos);
 
-			// Then, apply the local position
+			// Then, apply the local position.
 			godot::Transform3D xform;
 			xform.origin = local_pos;
 
 			data.multimesh->set_instance_transform(index, xform);
 
-			// Save cell's metadata
+			// Save cell's metadata.
 			data.cells.at(index)->local_xform = data.multimesh->get_instance_transform(index);
 			data.cells.at(index)->global_xform = data.multimesh_instance->get_global_transform() * data.multimesh->get_instance_transform(index);
 

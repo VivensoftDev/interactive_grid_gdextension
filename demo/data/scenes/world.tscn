@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://b6dh75ey4vefh"]
+[gd_scene load_steps=11 format=3 uid="uid://b6dh75ey4vefh"]
 
 [ext_resource type="PackedScene" uid="uid://causf6bjt06hi" path="res://data/scenes/main.tscn" id="1_fh8d7"]
 
@@ -26,6 +26,12 @@ points = PackedVector3Array(-1, 0, -1, -1, 0, 1, 1, 0, -1, 1, 0, 1)
 points = PackedVector3Array(0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5)
 
 [sub_resource type="MeshLibrary" id="MeshLibrary_fh8d7"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1w2rp"]
+top_radius = 0.57
+bottom_radius = 0.57
+height = 0.2
+radial_segments = 6
 
 [node name="World" type="Node3D"]
 
@@ -1044,3 +1050,12 @@ collision_layer = 8193
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Border/MeshInstance3D2/StaticBody3D"]
 shape = SubResource("ConvexPolygonShape3D_fh8d7")
+
+[node name="InteractiveGrid3D" type="InteractiveGrid3D" parent="."]
+_rows = 5
+_columns = 5
+cell_size = Vector2(1, 0.866)
+_cell_mesh = SubResource("CylinderMesh_1w2rp")
+"walkable color" = Color(1, 0.4117647, 0.78039217, 0.36078432)
+layout = 1
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42.949673, 0, -0.019440651)
