@@ -5,12 +5,12 @@
 #
 # Node: PlayerPawn (CharacterBody3D).
 #
-# Last modified: November 20, 2025
+# Last modified: November 27, 2025
 #
 # This file is part of the InteractiveGrid GDExtension Source Code.
 # Repository: https://github.com/antoinecharruel/interactive_grid_gdextension
 #
-# Version InteractiveGrid: 1.2.2
+# Version InteractiveGrid: 1.5.1
 # Version: Godot Engine v4.5.stable.steam - https://godotengine.org
 #
 # Author: Antoine Charruel
@@ -97,8 +97,15 @@ func move_player_to(x:float, z:float)-> void:
 		else:
 			animation_player.play("run", 0.2)
 
+		# direction vers la cible
+		var dir = (target_global_position - model.global_position)
+		dir.y = 0  # ignore la hauteur
+		dir = dir.normalized()
+
+		var target_rot = atan2(-dir.x, -dir.z)
+		model.rotation.y = lerp_angle(model.rotation.y, target_rot, 0.2)
+
 		move_and_slide()
-		model.look_at(direction + position)
 	# ----------------------------------------------------------------------------------------F-F*/
 	
 func move_player_along_path(path: PackedInt64Array)-> void:

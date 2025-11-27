@@ -23,14 +23,14 @@ void InteractiveGrid3D::_create() {
   Summary: Initializes the grid if it has not been created yet.
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 	if (!(data.flags & GFL_CREATED)) {
-		data.grid_center_position = get_global_transform().origin;
+		data.center_global_position = get_global_transform().origin;
 
 		_init_multi_mesh();
 		_init_astar();
 
 		data.flags |= GFL_CREATED;
 
-		center(data.grid_center_position);
+		center(data.center_global_position);
 
 		if (godot::Engine::get_singleton()->is_editor_hint()) {
 			set_visible(true);
@@ -155,15 +155,15 @@ void InteractiveGrid3D::_layout_cells_as_square_grid(godot::Vector3 center_posit
            square grid layout, positioning each cell relative to a 
 		   center.
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	data.grid_center_position = center_position;
+	data.center_global_position = center_position;
 
 	// Calculate the distances between the center and the grid's edges
 	const float center_to_grid_edge_x = (data.columns / 2) * data.cell_size.x;
 	const float center_to_grid_edge_z = (data.rows / 2) * data.cell_size.y;
 
 	//  Initialize the member `grid_offset_`
-	data.grid_offset.x = center_position.x - center_to_grid_edge_x;
-	data.grid_offset.z = center_position.z - center_to_grid_edge_z;
+	data.top_left_global_position.x = center_position.x - center_to_grid_edge_x;
+	data.top_left_global_position.z = center_position.z - center_to_grid_edge_z;
 
 	// Iterate through the cells
 	for (int row = 0; row < data.rows; row++) {
@@ -171,9 +171,9 @@ void InteractiveGrid3D::_layout_cells_as_square_grid(godot::Vector3 center_posit
 			const int index = row * data.columns + column; // Index in the 2D array stored as 1D
 
 			// Calculate the cell's position
-			float cell_pos_x = data.grid_offset.x + column * data.cell_size.x;
+			float cell_pos_x = data.top_left_global_position.x + column * data.cell_size.x;
 			float cell_pos_y = center_position.y;
-			float cell_pos_z = data.grid_offset.z + row * data.cell_size.y;
+			float cell_pos_z = data.top_left_global_position.z + row * data.cell_size.y;
 			godot::Vector3 cell_pos(cell_pos_x, cell_pos_y, cell_pos_z);
 
 			// Apply the position (global, not local)
@@ -220,7 +220,7 @@ void InteractiveGrid3D::_layout_cells_as_hexagonal_grid(godot::Vector3 center_po
 		https://www.gigacalculator.com/calculators/hexagon-calculator.php
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-  	data.grid_center_position = center_position;
+	data.center_global_position = center_position;
 
 	// The short diagonal (s) can be calculated using the formula: s = a · √3
 	const float hex_short_diagonal = data.cell_size.x; // s
@@ -228,25 +228,26 @@ void InteractiveGrid3D::_layout_cells_as_hexagonal_grid(godot::Vector3 center_po
 	// a = s / √3
 	const float hex_side_length = hex_short_diagonal / sqrt(3); // a
 
+	// r = a · √3 / 2
+	const float hex_inradius = hex_side_length * sqrt(3) / 2;
+
 	// Calculate the distances between the center and the grid's edges.
 	float center_to_grid_edge_x = (data.columns / 2) * data.cell_size.x;
 	float center_to_grid_edge_z = (data.rows / 2) * data.cell_size.y;
 
 	// Z-AXIS CORRECTION.
 	if (!(data.rows % 2)) {
-		// Vertex to opposite vertex.
 		center_to_grid_edge_z -= hex_side_length;
 	}
 
 	// X-AXIS CORRECTION.
 	if (!(data.columns % 2)) {
-		// Side to side.
-		center_to_grid_edge_x -= data.cell_size.x/2;
+		center_to_grid_edge_x -= data.cell_size.x / 2; // Side to side.
 	}
 
 	// Initialize the member `grid_offset_`.
-	data.grid_offset.x = center_position.x - center_to_grid_edge_x - data.cell_size.x / 2;
-	data.grid_offset.z = center_position.z - center_to_grid_edge_z - data.cell_size.y;
+	data.top_left_global_position.x = center_position.x - center_to_grid_edge_x - hex_inradius;
+	data.top_left_global_position.z = center_position.z - center_to_grid_edge_z - hex_side_length;
 
 	// Iterate through the cells.
 	for (int row = 0; row < data.rows; row++) {
@@ -259,15 +260,14 @@ void InteractiveGrid3D::_layout_cells_as_hexagonal_grid(godot::Vector3 center_po
 			bool is_even_row = (row % 2) == 0;
 
 			if (is_even_row) {
-				cell_pos_x = data.grid_offset.x + (column * data.cell_size.x);
-			}
-			else {
-				cell_pos_x = data.grid_offset.x + (column * data.cell_size.x) + (data.cell_size.x / 2);
+				cell_pos_x = data.top_left_global_position.x + (column * data.cell_size.x);
+			} else {
+				cell_pos_x = data.top_left_global_position.x + (column * data.cell_size.x) + (data.cell_size.x / 2);
 			}
 
 			// Apply final position.
 			float cell_pos_y = center_position.y;
-			float cell_pos_z = data.grid_offset.z + (row * data.cell_size.y) + data.cell_size.y;
+			float cell_pos_z = data.top_left_global_position.z + (row * data.cell_size.y) + hex_side_length;
 			godot::Vector3 cell_pos(cell_pos_x, cell_pos_y, cell_pos_z);
 
 			// Apply the position (global, not local).
@@ -991,6 +991,7 @@ void InteractiveGrid3D::_bind_methods() {
 	godot::ClassDB::bind_method(godot::D_METHOD("get_cell_global_position", "cell_index"), &InteractiveGrid3D::get_cell_global_position);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_cell_index_from_global_position", "global_position"), &InteractiveGrid3D::get_cell_index_from_global_position);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_grid_center_global_position"), &InteractiveGrid3D::get_grid_center_global_position);
+	godot::ClassDB::bind_method(godot::D_METHOD("get_top_left_global_position"), &InteractiveGrid3D::get_top_left_global_position);
 
 	// Grid layout.
 
@@ -1093,7 +1094,7 @@ void InteractiveGrid3D::_physics_process(double p_delta) {
 	_create(); // Create the grid at startup
 
 	if (godot::Engine::get_singleton()->is_editor_hint()) {
-		if (data.grid_center_position != get_global_transform().origin) {
+		if (data.center_global_position != get_global_transform().origin) {
 			_delete();
 		}
 	}
@@ -1449,52 +1450,76 @@ int InteractiveGrid3D::get_cell_index_from_global_position(godot::Vector3 global
 			center_to_edge_z = (data.rows / 2) * data.cell_size.y + data.cell_size.y / 2;
 
 			//  Initialize the member `grid_offset_`
-			data.grid_offset.x = data.grid_center_position.x - center_to_edge_x;
-			data.grid_offset.z = data.grid_center_position.z - center_to_edge_z;
+			data.top_left_global_position.x = data.center_global_position.x - center_to_edge_x;
+			data.top_left_global_position.z = data.center_global_position.z - center_to_edge_z;
 
 			if (is_even_row) {
-				if (global_position.x > (data.grid_center_position.x + center_to_edge_x - data.cell_size.x) || global_position.x < (data.grid_center_position.x - center_to_edge_x)) {
+				if (global_position.x > (data.center_global_position.x + center_to_edge_x - data.cell_size.x) || global_position.x < (data.center_global_position.x - center_to_edge_x)) {
 					return -1;
 				}
-				if (global_position.z > (data.grid_center_position.z + center_to_edge_z - data.cell_size.y) || global_position.z < (data.grid_center_position.z - center_to_edge_z)) {
+				if (global_position.z > (data.center_global_position.z + center_to_edge_z - data.cell_size.y) || global_position.z < (data.center_global_position.z - center_to_edge_z)) {
 					return -1;
 				}
 			} else {
-				if (global_position.x > (data.grid_center_position.x + center_to_edge_x) || global_position.x < (data.grid_center_position.x - center_to_edge_x)) {
+				if (global_position.x > (data.center_global_position.x + center_to_edge_x) || global_position.x < (data.center_global_position.x - center_to_edge_x)) {
 					return -1;
 				}
-				if (global_position.z > (data.grid_center_position.z + center_to_edge_z) || global_position.z < (data.grid_center_position.z - center_to_edge_z)) {
+				if (global_position.z > (data.center_global_position.z + center_to_edge_z) || global_position.z < (data.center_global_position.z - center_to_edge_z)) {
 					return -1;
 				}
 			}
 			break;
 		case LAYOUT::HEXAGONAL:
 
-			// Calculate the distances between the center and the grid's edges
-			center_to_edge_x = (data.columns / 2) * data.cell_size.x;
-			center_to_edge_z = (data.rows / 2) * data.cell_size.y;
+			// The short diagonal (s) can be calculated using the formula: s = a · √3
+			const float hex_short_diagonal = data.cell_size.x; // s
 
-			//  Initialize the member `grid_offset_`
-			data.grid_offset.x = data.grid_center_position.x - center_to_edge_x;
-			data.grid_offset.z = data.grid_center_position.z - center_to_edge_z;
+			// a = s / √3
+			const float hex_side_length = hex_short_diagonal / sqrt(3); // a
+
+			// The radius of the circumference that contains all vertices of a hexagon (R = a).
+			const float hex_circumradius = hex_side_length * 2;
+
+			// Calculate the distances between the center and the grid's edges.
+			float center_to_grid_edge_x = (data.columns / 2) * data.cell_size.x;
+			float center_to_grid_edge_z = (data.rows / 2) * data.cell_size.y;
+
+			// Z-AXIS CORRECTION.
+			if (!(data.rows % 2)) {
+				center_to_grid_edge_z -= hex_side_length;
+			}
+
+			// X-AXIS CORRECTION.
+			if (!(data.columns % 2)) {
+				// Side to side.
+				center_to_grid_edge_x -= data.cell_size.x / 2;
+			}
+
+			godot::print_line("top_left_global_position", data.top_left_global_position);
+
+			if (global_position.x < (data.top_left_global_position.x - data.cell_size.x / 2)) {
+				return -1;
+			}
+
+			if (global_position.x > (data.top_left_global_position.x + center_to_grid_edge_x * 2 + data.cell_size.x)) {
+				return -1;
+			}
+
+			if (global_position.z < data.top_left_global_position.z) {
+				return -1;
+			}
 
 			if (is_even_row) {
-				if (global_position.x > (data.grid_center_position.x + center_to_edge_x - (data.cell_size.x / 2)) || global_position.x < (data.grid_center_position.x - center_to_edge_x - data.cell_size.x)) {
-					return -1;
-				}
-				if (global_position.z > (data.grid_center_position.z + center_to_edge_z - (data.cell_size.y / 2)) || global_position.z < (data.grid_center_position.z - center_to_edge_z - data.cell_size.y)) {
+				if (global_position.z > (data.top_left_global_position.z + center_to_grid_edge_z * 2 + hex_circumradius + hex_side_length / 2)) {
+					godot::print_line("is_even_row true");
 					return -1;
 				}
 			} else {
-				if (global_position.x > (data.grid_center_position.x + center_to_edge_x + (data.cell_size.x / 2)) || global_position.x < (data.grid_center_position.x - center_to_edge_x - data.cell_size.x)) {
-					return -1;
-				}
-
-				if (global_position.z > (data.grid_center_position.z + center_to_edge_z + (data.cell_size.y / 2)) || global_position.z < (data.grid_center_position.z - center_to_edge_z - data.cell_size.y)) {
+				if (global_position.z > (data.top_left_global_position.z + center_to_grid_edge_z * 2 + hex_circumradius)) {
+					godot::print_line("is_even_row false");
 					return -1;
 				}
 			}
-			break;
 	}
 
 	float closest_distance = std::numeric_limits<float>::max();
@@ -1524,7 +1549,15 @@ godot::Vector3 InteractiveGrid3D::get_grid_center_global_position() const {
   Summary: Returns the central position of the interactive grid in world
            coordinates.
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return data.grid_center_position;
+	return data.center_global_position;
+}
+
+godot::Vector3 InteractiveGrid3D::get_top_left_global_position() const {
+	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+  Summary: Called to re-center the grid. This also resets the grid state.
+  M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+
+	return data.top_left_global_position;
 }
 
 void InteractiveGrid3D::center(godot::Vector3 center_position) {

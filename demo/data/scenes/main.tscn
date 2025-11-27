@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://causf6bjt06hi"]
+[gd_scene load_steps=9 format=3 uid="uid://causf6bjt06hi"]
 
 [ext_resource type="Shader" uid="uid://dc4oav4wip1yi" path="res://data/shaders/dynamic.gdshader" id="2_yeeyf"]
 [ext_resource type="PackedScene" uid="uid://cg8gsg3iyhmeu" path="res://data/ui/try_me.tscn" id="4_2qaj2"]
@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://dbna5exmjhbhp" path="res://data/scenes/pawn_player.tscn" id="5_dxyxo"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_dkjo2"]
+top_radius = 0.577
+bottom_radius = 0.577
 height = 0.1
 radial_segments = 6
 
@@ -13,9 +15,21 @@ radial_segments = 6
 render_priority = 0
 shader = ExtResource("2_yeeyf")
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yeeyf"]
+albedo_color = Color(0, 1, 1, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_pbhab"]
+material = SubResource("StandardMaterial3D_yeeyf")
+top_radius = 0.05
+bottom_radius = 0.05
+
 [node name="Main" type="Node3D"]
 
 [node name="PawnPlayer" parent="." instance=ExtResource("5_dxyxo")]
+
+[node name="Camera3D_Iso" parent="PawnPlayer" index="1"]
+transform = Transform3D(0.70710677, -0.49999994, 0.49999994, 0, 0.7071067, 0.7071067, -0.70710677, -0.49999994, 0.49999994, 8, 12, 8)
+size = 12.0
 
 [node name="RayCastFromMouse" parent="PawnPlayer" index="2"]
 exclude_parent = false
@@ -24,14 +38,18 @@ collision_mask = 0
 [node name="TryMe" parent="." instance=ExtResource("4_2qaj2")]
 
 [node name="InteractiveGrid3D" type="InteractiveGrid3D" parent="."]
-_rows = 16
-_columns = 19
+_rows = 17
+_columns = 18
 cell_size = Vector2(1, 0.86)
 _cell_mesh = SubResource("CylinderMesh_dkjo2")
 _material_override = SubResource("ShaderMaterial_pbhab")
 layout = 1
 movement = 1
 script = ExtResource("4_w868w")
+
+[node name="top_left_debug_mesh" type="CSGMesh3D" parent="InteractiveGrid3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+mesh = SubResource("CylinderMesh_pbhab")
 
 [editable path="PawnPlayer"]
 [editable path="TryMe"]
