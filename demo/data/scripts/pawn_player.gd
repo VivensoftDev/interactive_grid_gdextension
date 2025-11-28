@@ -5,12 +5,12 @@
 #
 # Node: PlayerPawn (CharacterBody3D).
 #
-# Last modified: November 27, 2025
+# Last modified: November 28, 2025
 #
 # This file is part of the InteractiveGrid GDExtension Source Code.
 # Repository: https://github.com/antoinecharruel/interactive_grid_gdextension
 #
-# Version InteractiveGrid: 1.5.1
+# Version InteractiveGrid: 1.6.0
 # Version: Godot Engine v4.5.stable.steam - https://godotengine.org
 #
 # Author: Antoine Charruel
@@ -57,7 +57,8 @@ func _physics_process(delta: float) -> void:
 	
 	# Add the gravity.
 	if not is_on_floor():
-		self.velocity += get_gravity() * delta
+		velocity += get_gravity() * delta
+		move_and_slide()
 	
 	if self.velocity == Vector3.ZERO:
 		if _pawn_curent_movements_states != _pawn_movements_states.IDLE:

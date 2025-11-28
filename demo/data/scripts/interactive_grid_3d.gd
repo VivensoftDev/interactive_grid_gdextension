@@ -5,12 +5,12 @@
 #
 # Node: InteractiveGrid (InteractiveGrid).
 #
-# Last modified: November 27, 2025
+# Last modified: November 28, 2025
 #
 # This file is part of the InteractiveGrid GDExtension Source Code.
 # Repository: https://github.com/antoinecharruel/interactive_grid_gdextension
 #
-# Version InteractiveGrid: 1.5.1
+# Version InteractiveGrid: 1.6.0
 # Version: Godot Engine v4.5.stable.steam - https://godotengine.org
 #
 # Author: Antoine Charruel
@@ -71,8 +71,9 @@ func open_grid():
 				# Centers the grid.
 				# ! Info: every time center is called, the state of the cells is reset.
 				self.center(player_pawn_collision_shape_3d.global_position)
-				var index_cell_pawn: int = self.get_cell_index_from_global_position(self.get_grid_center_global_position())
-				self.hide_distant_cells(index_cell_pawn, 6)
+				var index_pawn_cell: int = self.get_cell_index_from_global_position(self.get_grid_center_global_position())
+				self.hide_distant_cells(index_pawn_cell, 6)
+				self.compute_unreachable_cells(index_pawn_cell)
 				
 				_is_grid_open = true
 				try_me.visible = false
