@@ -1,31 +1,143 @@
-[gd_scene load_steps=6 format=3 uid="uid://b6dh75ey4vefh"]
+[gd_scene load_steps=14 format=3 uid="uid://b6dh75ey4vefh"]
 
 [ext_resource type="PackedScene" uid="uid://causf6bjt06hi" path="res://data/scenes/main.tscn" id="1_fh8d7"]
 [ext_resource type="PackedScene" uid="uid://c7nyakvh08r3u" path="res://data/scenes/camp.tscn" id="2_c8ggi"]
+[ext_resource type="PackedScene" uid="uid://dxuyyb410gqj5" path="res://data/ressources/tools/LightningTools.tscn" id="5_t61oy"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_hwl72"]
-sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
-ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+[sub_resource type="Shader" id="Shader_t61oy"]
+code = "shader_type sky;
 
-[sub_resource type="Sky" id="Sky_fh8d7"]
-sky_material = SubResource("ProceduralSkyMaterial_hwl72")
+uniform vec3 top_color : source_color = vec3(1.0);
+uniform vec3 bottom_color : source_color = vec3(1.0);
+uniform sampler2D gradient_curve : repeat_disable, filter_linear;
+uniform sampler2D noise_texture : source_color;
 
-[sub_resource type="Environment" id="Environment_kp8o4"]
+
+uniform sampler2D moon_texture : source_color;
+uniform vec3 moon_direction = vec3(1.0, 0.5, 0.0);
+uniform float moon_size = 0.05;
+
+
+
+void sky() {
+
+	vec3 color_gradient = mix(top_color.rgb, bottom_color.rgb, texture(gradient_curve, vec2(SKY_COORDS.y, 0.0)).x);
+
+
+
+
+    // Calculate dot product between view direction and moon direction
+    float dot_product = dot(EYEDIR, normalize(moon_direction));
+	float cos_moon_size = cos(moon_size);
+
+    if (dot_product > cos_moon_size) {
+        // We're looking at the moon
+        vec3 right = normalize(cross(vec3(0.0, 1.0, 0.0), moon_direction));
+        vec3 up = normalize(cross(moon_direction, right));
+        vec2 moon_uv = vec2(
+            dot(EYEDIR, right),
+            dot(EYEDIR, up)
+        ) / sin(moon_size) * 0.5 + 0.5;
+
+        vec4 moon_color = texture(moon_texture, moon_uv);
+
+        float sky_blend = smoothstep(cos_moon_size, cos(moon_size * 0.2), dot_product) * moon_color.a;
+        COLOR = mix(color_gradient, moon_color.rgb, sky_blend);
+    } else {
+        // Regular sky color
+		float stars_mask = 1.0-smoothstep(0.36, 0.52, SKY_COORDS.y);
+		float stars = texture(noise_texture, SKY_COORDS).r;
+		stars = smoothstep(stars, 1.0, 0.6);
+		stars *= stars_mask;
+		COLOR = color_gradient + vec3(stars);
+    }
+}
+"
+
+[sub_resource type="Curve" id="Curve_67vd5"]
+_data = [Vector2(0.331719, 0.0391753), 0.0, 0.0, 0, 0, Vector2(0.697336, 1), 0.51276, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_moxc7"]
+curve = SubResource("Curve_67vd5")
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_eh1dn"]
+
+[sub_resource type="Gradient" id="Gradient_2ve3l"]
+offsets = PackedFloat32Array(0.784123, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_5dc2k"]
+frequency = 0.3589
+fractal_octaves = 4
+cellular_distance_function = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_83fre"]
+width = 1024
+height = 1024
+generate_mipmaps = false
+noise = SubResource("FastNoiseLite_5dc2k")
+color_ramp = SubResource("Gradient_2ve3l")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_4c78s"]
+shader = SubResource("Shader_t61oy")
+shader_parameter/top_color = Color(0.288469, 0.182916, 1, 1)
+shader_parameter/bottom_color = Color(1, 0.46805, 0, 1)
+shader_parameter/gradient_curve = SubResource("CurveTexture_moxc7")
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_83fre")
+shader_parameter/moon_texture = SubResource("CompressedTexture2D_eh1dn")
+shader_parameter/moon_direction = Vector3(-1.095, 0.68, 1)
+shader_parameter/moon_size = 0.045
+
+[sub_resource type="Sky" id="Sky_0h0bb"]
+sky_material = SubResource("ShaderMaterial_4c78s")
+
+[sub_resource type="Environment" id="Environment_5p7ai"]
 background_mode = 2
-sky = SubResource("Sky_fh8d7")
+sky = SubResource("Sky_0h0bb")
+ambient_light_source = 3
+ambient_light_color = Color(0.74902, 0.742654, 0.615273, 1)
+ambient_light_sky_contribution = 0.0
 tonemap_mode = 2
-glow_enabled = true
+tonemap_exposure = 1.05
+tonemap_white = 0.95
+ssao_enabled = true
+ssao_radius = 2.0
+ssao_intensity = 1.4
+glow_intensity = 4.98
+glow_strength = 0.26
+glow_bloom = 0.08
+glow_blend_mode = 0
+glow_hdr_threshold = 0.26
+glow_hdr_scale = 0.0
+glow_hdr_luminance_cap = 18.75
+glow_map_strength = 1.0
+fog_light_color = Color(0.843137, 0.737255, 0.329412, 1)
+fog_density = 0.0
+fog_aerial_perspective = 1.0
+fog_sky_affect = 0.0
+fog_height_density = 0.1
+volumetric_fog_density = 0.01
+volumetric_fog_albedo = Color(0.843137, 0.737255, 0.329412, 1)
+volumetric_fog_emission = Color(0.843137, 0.737255, 0.329412, 1)
 
 [node name="World" type="Node3D"]
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
-shadow_enabled = true
-
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_kp8o4")
+environment = SubResource("Environment_5p7ai")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.56123996, 0.79505605, 0.22999059, 0.68876356, 0.29457843, 0.6624412, 0.4589276, 0.53019756, -0.7129348, 43.409424, 26.8832, -4.690445)
+light_energy = 0.53
+shadow_enabled = true
+directional_shadow_max_distance = 40.0
 
 [node name="Main" parent="." instance=ExtResource("1_fh8d7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.0592103, 0.32895422, 9.158834)
+
+[node name="LightningTools" parent="." instance=ExtResource("5_t61oy")]
+transform = Transform3D(1.4064668, 0, 1.421918, 0, 2, 0, -1.421918, 0, 1.4064668, -11.293724, 5.3920174, -4.7425556)
+visible = false
 
 [node name="camp" parent="." instance=ExtResource("2_c8ggi")]

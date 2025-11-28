@@ -173,9 +173,7 @@ func target_reached()-> void:
 		
 		interactive_grid_3d.hide_distant_cells(index_pawn_cell, 6)
 		interactive_grid_3d.compute_unreachable_cells(index_pawn_cell)
-				
-		interactive_grid_3d.set_cell_color(index_pawn_cell, Color(0.6, 0.8, 0.18, 1))
-		
+
 		_is_target_reached = true
 	# ----------------------------------------------------------------------------------------F-F*/
 	

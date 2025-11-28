@@ -227,11 +227,8 @@ void fragment() {
 
 ## TODO
 
+- [ ] Allow the user to choose custom cell flags.
 - [ ] Create InteractiveGrid2D.
-- [ ] Add vaultable cells.
-  + [ ] A Define `CFL_VAULT` flag for cells that can be vaulted/climbed.
-  + [ ] Assign vaultable cells to a specific collision layer checked by `scan_environnement_obstacles` method.
-  + [ ] Add a visual indicator (color) for vaultable cells using `ADD_PROPERTY`.
 
 ## Need Help, Found an Issue, or Want to Share Your Work? 🛠️🎨
 
@@ -243,6 +240,11 @@ If you encounter any issues, have questions, want to share your project using In
   </a>
 </div>
 
+## Assets and Resources Used
+
+- Kenney. Nature Kit · Kenney. https://kenney.nl/assets/nature-kit
+- Character movement in 3D | GDQuest Library. https://www.gdquest.com/library/character_movement_3d_platformer/#create-a-3d-character-controller-in-godot-4
+
 ## References (Videos & Websites)
 
 - BornCG. (2024, August 4). Godot 4 3D Platformer Lesson #13: Align Player with Ground! [Video]. YouTube. https://www.youtube.com/watch?v=Y5OiChOukfg
@@ -252,3 +254,4 @@ If you encounter any issues, have questions, want to share your project using In
 		https://www.youtube.com/watch?v=3Lt2TfP8WEw
 - Patel, A. J. (2013). Hexagonal grids. 
   	   https://www.redblobgames.com/grids/hexagons/#neighbors
+
