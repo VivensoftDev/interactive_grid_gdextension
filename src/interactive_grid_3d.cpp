@@ -1440,7 +1440,8 @@ int InteractiveGrid3D::get_cell_index_from_global_position(godot::Vector3 global
 	}
 
 	float center_to_edge_x{ 0.0f }, center_to_edge_z{ 0.0f };
-	bool is_even_row = (data.rows % 2) == 0;
+	bool is_even_row = !(data.rows % 2);
+	bool is_even_column = !(data.columns % 2);
 
 	switch (data.layout_index) {
 		case LAYOUT::SQUARE:
@@ -1485,12 +1486,12 @@ int InteractiveGrid3D::get_cell_index_from_global_position(godot::Vector3 global
 			float center_to_grid_edge_z = (data.rows / 2) * data.cell_size.y;
 
 			// Z-AXIS CORRECTION.
-			if (!(data.rows % 2)) {
+			if (is_even_row) {
 				center_to_grid_edge_z -= hex_side_length;
 			}
 
 			// X-AXIS CORRECTION.
-			if (!(data.columns % 2)) {
+			if (is_even_column) {
 				// Side to side.
 				center_to_grid_edge_x -= data.cell_size.x / 2;
 			}

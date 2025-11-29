@@ -131,6 +131,7 @@ environment = SubResource("Environment_5p7ai")
 transform = Transform3D(-0.56123996, 0.79505605, 0.22999059, 0.68876356, 0.29457843, 0.6624412, 0.4589276, 0.53019756, -0.7129348, 43.409424, 26.8832, -4.690445)
 light_energy = 0.53
 shadow_enabled = true
+directional_shadow_blend_splits = true
 directional_shadow_max_distance = 40.0
 
 [node name="Main" parent="." instance=ExtResource("1_fh8d7")]
