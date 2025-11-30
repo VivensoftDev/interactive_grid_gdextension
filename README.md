@@ -28,6 +28,8 @@ InteractiveGrid is a Godot GDExtension that allows player interaction with a 3D 
 - Fully compatible with Godot 4.5.
 - Cross-platform support (Linux, Windows, macOS, Android, iOS, Web/HTML5).
 
+[![](/docs/youtube/image_with_play_button.png)](https://www.youtube.com/watch?v=L6V0UsJYBfg)
+
 ## Try the demo on Itch.io! 🎮
 
 ![](/docs/preview/demo.gif)
