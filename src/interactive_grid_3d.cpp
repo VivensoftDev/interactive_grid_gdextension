@@ -112,7 +112,6 @@ void InteractiveGrid3D::_init_multi_mesh() {
 	}
 
 	_apply_material(data.material_override);
-	data.flags |= GFL_VISIBLE;
 
 	if (_debug_options.print_logs_enabled) {
 		PrintLine(__FILE__, __FUNCTION__, __LINE__, "The grid MultiMesh has been created.");
@@ -703,7 +702,7 @@ void InteractiveGrid3D::_scan_environnement_obstacles() {
 		   are marked as valid (walkable). Debug logs are generated to 
 		   provide information about the collision results.
   M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	if (!(data.flags & GFL_VISIBLE)) {
+	if (!is_visible()) {
 		return;
 	}
 
@@ -1017,11 +1016,6 @@ void InteractiveGrid3D::_bind_methods() {
 
 	godot::ClassDB::bind_method(godot::D_METHOD("set_collision_detection_shape_scale", "value"), &InteractiveGrid3D::set_collision_detection_shape_scale);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_collision_detection_shape_scale"), &InteractiveGrid3D::get_collision_detection_shape_scale);
-
-	// Grid visibility.
-
-	godot::ClassDB::bind_method(godot::D_METHOD("set_visible", "visible"), &InteractiveGrid3D::set_visible);
-	godot::ClassDB::bind_method(godot::D_METHOD("is_visible"), &InteractiveGrid3D::is_visible);
 
 	godot::ClassDB::bind_method(godot::D_METHOD("compute_unreachable_cells", "start_cell_index"), &InteractiveGrid3D::compute_unreachable_cells);
 	godot::ClassDB::bind_method(godot::D_METHOD("hide_distant_cells", "start_cell_index", "distance"), &InteractiveGrid3D::hide_distant_cells);
@@ -1639,39 +1633,6 @@ void InteractiveGrid3D::center(godot::Vector3 center_position) {
 	}
 }
 
-void InteractiveGrid3D::set_visible(bool visible) {
-	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-  Summary: Sets the visibility of the grid.
-  M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	if (!(data.flags & GFL_CREATED)) {
-		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid has not been created");
-		return; // !Exit
-	}
-
-	if ((data.flags & GFL_VISIBLE) && !visible) {
-		// Visible
-		_set_cells_visible(false);
-		if (_debug_options.print_logs_enabled) {
-			PrintLine(__FILE__, __FUNCTION__, __LINE__, "false.");
-		}
-		data.flags &= ~GFL_VISIBLE;
-	} else if (!(data.flags & GFL_VISIBLE) && visible) {
-		// Not visible
-		_set_cells_visible(true);
-		if (_debug_options.print_logs_enabled) {
-			PrintLine(__FILE__, __FUNCTION__, __LINE__, "true.");
-		}
-		data.flags |= GFL_VISIBLE;
-	}
-}
-
-bool InteractiveGrid3D::is_visible() const {
-	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-  Summary: Checks whether the grid is currently visible in the scene.
-  M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-	return (data.flags & GFL_VISIBLE) != 0;
-}
-
 void InteractiveGrid3D::compute_unreachable_cells(unsigned int start_cell_index) {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	Summary: Iterates over all grid cells and marks as unreachable those
@@ -1688,7 +1649,7 @@ void InteractiveGrid3D::compute_unreachable_cells(unsigned int start_cell_index)
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	if ((data.flags & GFL_VISIBLE) && !(data.flags & GFL_CELL_UNREACHABLE_HIDDEN)) {
+	if ((is_visible()) && !(data.flags & GFL_CELL_UNREACHABLE_HIDDEN)) {
 		_configure_astar();
 		_breadth_first_search(start_cell_index);
 		data.flags |= GFL_CELL_UNREACHABLE_HIDDEN;
@@ -1712,7 +1673,7 @@ void InteractiveGrid3D::hide_distant_cells(unsigned int start_cell_index, float 
 		return; // !Exit
 	}
 
-	if ((data.flags & GFL_VISIBLE) && !(data.flags & GFL_CELL_DISTANT_HIDDEN)) {
+	if ((is_visible()) && !(data.flags & GFL_CELL_DISTANT_HIDDEN)) {
 		// Iterate through the cells
 		for (int row = 0; row < data.rows; row++) {
 			for (int column = 0; column < data.columns; column++) {

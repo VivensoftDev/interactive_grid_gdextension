@@ -74,13 +74,11 @@ private:
 
 	// Grid flags.
 
-	static constexpr int GFL_DEBUG = 1 << 0;
-	static constexpr int GFL_CREATED = 1 << 1;
-	static constexpr int GFL_CENTERED = 1 << 2;
-	static constexpr int GFL_VISIBLE = 1 << 3;
-	static constexpr int GFL_CELL_UNREACHABLE_HIDDEN = 1 << 4;
-	static constexpr int GFL_CELL_DISTANT_HIDDEN = 1 << 5;
-	static constexpr int GFL_HOVER_ENABLED = 1 << 6;
+	static constexpr int GFL_CREATED = 1 << 0;
+	static constexpr int GFL_CENTERED = 1 << 1;
+	static constexpr int GFL_CELL_UNREACHABLE_HIDDEN = 1 << 2;
+	static constexpr int GFL_CELL_DISTANT_HIDDEN = 1 << 3;
+	static constexpr int GFL_HOVER_ENABLED = 1 << 4;
 
 	// Cell flags.
 
@@ -272,8 +270,8 @@ public:
 
 	// --- Grid visibility
 
-	void set_visible(bool visible);
-	bool is_visible() const;
+	//void set_visible(bool visible);
+	//bool is_visible() const;
 
 	// --- Compute
 
