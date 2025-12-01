@@ -1930,7 +1930,10 @@ void InteractiveGrid3D::select_cell(unsigned int cell_index) {
 		return; // !Exit
 	}
 
-	if (is_cell_index_out_of_bounds(__FILE__, __FUNCTION__, __LINE__, cell_index)) {
+	if (cell_index == -1) {
+		// return without an error message.
+		return; // !Exit
+	} else if (is_cell_index_out_of_bounds(__FILE__, __FUNCTION__, __LINE__, cell_index)) {
 		return; // !Exit
 	}
 
