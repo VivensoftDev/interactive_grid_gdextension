@@ -163,8 +163,8 @@ private:
 		godot::Vector2 cell_size = godot::Vector2(1.0f, 1.0f);
 		std::vector<Cell *> cells;
 
-		//godot::Dictionary custom_cell_flags = godot::Dictionary();
-		godot::Ref<CustomCellData> custom_cell_data;
+		// godot::Ref<CustomCellData> custom_cell_data;
+		godot::Array custom_cell_data;
 
 		godot::Array selected_cells;
 		int hovered_cell_index{ -1 };
@@ -256,8 +256,8 @@ public:
 	godot::Color get_hovered_color() const;
 
 	// TODO
-	void set_custom_cell_data(const godot::Ref<CustomCellData> &p_custom_cell_data);
-	godot::Ref<CustomCellData> get_custom_cell_data() const;
+	void set_custom_cell_data(const godot::Array &p_custom_cell_data);
+	godot::Array get_custom_cell_data() const;
 
 	// --- Grid materials
 
