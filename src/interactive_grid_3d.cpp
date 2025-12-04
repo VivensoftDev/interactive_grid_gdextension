@@ -1365,7 +1365,7 @@ void InteractiveGrid3D::add_custom_data(unsigned int cell_index, godot::String c
 
 		if (use_custom_color) {
 			data.cells.at(cell_index)->has_custom_color = true;
-			data.cells.at(cell_index)->custom_color = custom_cell_data->get_flags_color();
+			data.cells.at(cell_index)->custom_color = custom_cell_data->get_color();
 			set_cell_color(cell_index, data.cells.at(cell_index)->custom_color);
 		}
 	}

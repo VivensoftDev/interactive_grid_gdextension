@@ -65,12 +65,14 @@ private:
 
 	typedef struct Cell {
 		// Cell data
-		uint16_t index = -1;
+		int16_t index {-1};
 		godot::Transform3D local_xform;
 		godot::Transform3D global_xform;
-		uint32_t flags = 0;
+		uint32_t flags {0};
+		uint32_t collision_layer {0};
 		godot::Color color;
-		uint32_t custom_flags = 0;
+		uint32_t custom_flags {0};
+		uint32_t custom_collision_layer {0};
 		godot::Color custom_color;
 		bool has_custom_color{ false };
 		godot::PackedInt64Array neighbors{};

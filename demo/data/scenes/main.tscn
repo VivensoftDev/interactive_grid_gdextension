@@ -14,12 +14,11 @@ radial_segments = 6
 [sub_resource type="CustomCellData" id="CustomCellData_yeeyf"]
 custom_data_name = "CFL_NEIGHBORS"
 flags = 256
-flags_color = Color(0, 1, 0.41960785, 1)
+flags_color = Color(1, 0, 1, 1)
 
 [sub_resource type="CustomCellData" id="CustomCellData_g470t"]
 custom_data_name = "CFL_PLAYER"
 flags = 1024
-flags_color = Color(1, 0, 0.9490196, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yeeyf"]
 render_priority = 0
