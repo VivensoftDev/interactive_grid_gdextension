@@ -29,6 +29,21 @@
 
 #include "interactive_grid_3d.h"
 
+constexpr const char *default_shader_code = R"(
+		shader_type spatial;
+		render_mode unshaded, cull_disabled, depth_draw_opaque;
+		varying vec4 instance_c;
+
+		void vertex() {
+			instance_c = INSTANCE_CUSTOM;
+		}
+
+		void fragment() {
+			ALBEDO = instance_c.rgb;
+			ALPHA = instance_c.a;
+		}
+    )";
+
 void InteractiveGrid3D::_create() {
 	if (!(data.flags & GFL_CREATED)) {
 		data.center_global_position = get_global_transform().origin;
@@ -211,20 +226,16 @@ void InteractiveGrid3D::_layout_cells_as_hexagonal_grid(godot::Vector3 p_center_
 			float cell_pos_z = data.top_left_global_position.z + (row * data.cell_size.y) + hex_side_length;
 			godot::Vector3 cell_pos(cell_pos_x, cell_pos_y, cell_pos_z);
 
-			// Apply the position (global, not local).
 			godot::Transform3D global_xform = data.multimesh_instance->get_global_transform();
-			godot::Transform3D local_xform = global_xform.affine_inverse(); // Inverse du global
+			godot::Transform3D local_xform = global_xform.affine_inverse();
 
-			// Convert the global position to local:
 			godot::Vector3 local_pos = local_xform.xform(cell_pos);
 
-			// Then, apply the local position.
 			godot::Transform3D xform;
 			xform.origin = local_pos;
 
 			data.multimesh->set_instance_transform(index, xform);
 
-			// Save cell's metadata.
 			data.cells.at(index)->local_xform = data.multimesh->get_instance_transform(index);
 			data.cells.at(index)->global_xform = data.multimesh_instance->get_global_transform() * data.multimesh->get_instance_transform(index);
 
@@ -697,8 +708,6 @@ void InteractiveGrid3D::_scan_environnement_custom_data() {
 							if (!custom_cell_data->has_layers_in_mask(collision_layer)) {
 								continue;
 							}
-
-							PrintLine(__FILE__, __FUNCTION__, __LINE__, "name: ", custom_cell_data->get_custom_data_name());
 
 							data.cells.at(cell_index)->custom_flags |= custom_cell_data->get_layer_mask();
 							data.cells.at(cell_index)->flags |= custom_cell_data->get_layer_mask();
@@ -1177,23 +1186,7 @@ void InteractiveGrid3D::apply_default_material() {
 
 	godot::Ref<godot::Shader> shader;
 	shader.instantiate();
-
-	godot::String shader_code = R"(
-		shader_type spatial;
-		render_mode unshaded, cull_disabled, depth_draw_opaque;
-		varying vec4 instance_c;
-
-		void vertex() {
-			instance_c = INSTANCE_CUSTOM;
-		}
-
-		void fragment() {
-			ALBEDO = instance_c.rgb;
-			ALPHA = instance_c.a;
-		}
-    )";
-
-	shader->set_code(shader_code);
+	shader->set_code(default_shader_code);
 
 	godot::Ref<godot::ShaderMaterial> shader_material;
 	shader_material.instantiate();
