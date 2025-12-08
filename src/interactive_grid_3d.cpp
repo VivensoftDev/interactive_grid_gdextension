@@ -1264,7 +1264,7 @@ godot::Vector3 InteractiveGrid3D::get_cell_global_position(int p_cell_index) con
 	return cell_global_position;
 }
 
-int InteractiveGrid3D::get_cell_index_from_global_position(godot::Vector3 p_global_position) {
+int InteractiveGrid3D::get_cell_index_from_global_position(godot::Vector3 p_global_position) const {
 	if (!(data.flags & GFL_CREATED)) {
 		PrintError(__FILE__, __FUNCTION__, __LINE__, "The grid has not been created.");
 		return -1;
@@ -1279,14 +1279,16 @@ int InteractiveGrid3D::get_cell_index_from_global_position(godot::Vector3 p_glob
 	bool is_even_row = !(data.rows % 2);
 	bool is_even_column = !(data.columns % 2);
 
+	godot::Vector3 top_left_global_position;
+
 	switch (data.layout_index) {
 		case Layout::LAYOUT_SQUARE:
 
 			center_to_edge_x = (data.columns / 2) * data.cell_size.x + data.cell_size.x / 2;
 			center_to_edge_z = (data.rows / 2) * data.cell_size.y + data.cell_size.y / 2;
 
-			data.top_left_global_position.x = data.center_global_position.x - center_to_edge_x;
-			data.top_left_global_position.z = data.center_global_position.z - center_to_edge_z;
+			top_left_global_position.x = data.center_global_position.x - center_to_edge_x;
+			top_left_global_position.z = data.center_global_position.z - center_to_edge_z;
 
 			if (is_even_row) {
 				if (p_global_position.x > (data.center_global_position.x + center_to_edge_x - data.cell_size.x) || p_global_position.x < (data.center_global_position.x - center_to_edge_x)) {
@@ -1317,35 +1319,38 @@ int InteractiveGrid3D::get_cell_index_from_global_position(godot::Vector3 p_glob
 
 			const float hex_side_to_side = data.cell_size.x / 2;
 
-			float center_to_grid_edge_x = (data.columns / 2) * data.cell_size.x;
-			float center_to_grid_edge_z = (data.rows / 2) * data.cell_size.y;
+			float center_to_edge_x = (data.columns / 2) * data.cell_size.x;
+			float center_to_edge_z = (data.rows / 2) * data.cell_size.y;
+
+			top_left_global_position.x = data.center_global_position.x - center_to_edge_x;
+			top_left_global_position.z = data.center_global_position.z - center_to_edge_z;
 
 			if (is_even_row) {
-				center_to_grid_edge_z -= hex_side_length;
+				center_to_edge_z -= hex_side_length;
 			}
 
 			if (is_even_column) {
-				center_to_grid_edge_x -= hex_side_to_side;
+				center_to_edge_x -= hex_side_to_side;
 			}
 
-			if (p_global_position.x < (data.top_left_global_position.x - hex_side_to_side)) {
+			if (p_global_position.x < (top_left_global_position.x - hex_side_to_side)) {
 				return -1;
 			}
 
-			if (p_global_position.x > (data.top_left_global_position.x + center_to_grid_edge_x * 2 + data.cell_size.x)) {
+			if (p_global_position.x > (top_left_global_position.x + center_to_edge_x * 2 + data.cell_size.x)) {
 				return -1;
 			}
 
-			if (p_global_position.z < data.top_left_global_position.z) {
+			if (p_global_position.z < top_left_global_position.z) {
 				return -1;
 			}
 
 			if (is_even_row) {
-				if (p_global_position.z > (data.top_left_global_position.z + center_to_grid_edge_z * 2 + hex_circumradius + hex_side_length / 2)) {
+				if (p_global_position.z > (top_left_global_position.z + center_to_edge_z * 2 + hex_circumradius + hex_side_length / 2)) {
 					return -1;
 				}
 			} else {
-				if (p_global_position.z > (data.top_left_global_position.z + center_to_grid_edge_z * 2 + hex_circumradius)) {
+				if (p_global_position.z > (top_left_global_position.z + center_to_edge_z * 2 + hex_circumradius)) {
 					return -1;
 				}
 			}
