@@ -270,7 +270,7 @@ public:
 
 	void select_cell(int p_cell_index);
 	godot::Array get_selected_cells();
-	int get_latest_selected();
+	int get_latest_selected() const;
 	godot::PackedInt64Array get_path(int p_start_cell_index, int p_target_cell_index) const;
 	godot::PackedInt64Array get_neighbors(int p_cell_index) const;
 

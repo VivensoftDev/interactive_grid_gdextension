@@ -1686,7 +1686,7 @@ godot::Array InteractiveGrid3D::get_selected_cells() {
 	return data.selected_cells;
 }
 
-int InteractiveGrid3D::get_latest_selected() {
+int InteractiveGrid3D::get_latest_selected() const {
 	return data.selected_cells.back();
 }
 

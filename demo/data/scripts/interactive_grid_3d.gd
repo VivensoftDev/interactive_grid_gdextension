@@ -45,6 +45,7 @@ func _process(delta: float) -> void:
 	
 	# Highlight the cell under the mouse.
 	if self.get_selected_cells().is_empty():
+		_path = []
 		self.highlight_on_hover(ray_cast_from_mouse.get_ray_intersection_position())
 	else:
 		var selected_cells: Array = self.get_selected_cells()
@@ -52,6 +53,7 @@ func _process(delta: float) -> void:
 		_path = self.get_path(pawn_current_cell_index, selected_cells[0])
 		
 	if not _path.is_empty():
+		print("move")
 		pawn_player.move_player_along_path(_path)
 
 			
