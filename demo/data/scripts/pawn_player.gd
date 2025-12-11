@@ -31,12 +31,10 @@ extends CharacterBody3D
 
 @onready var interactive_grid_3d: InteractiveGrid3D = $"../InteractiveGrid3D"
 @onready var animation_player: AnimationPlayer = $model/AnimationPlayer
-@onready var player_pawn_collision_shape_3d: CollisionShape3D = $PlayerPawnCollisionShape3D
 @onready var model: Node3D = $model
 @onready var start_control: Control = $"../Start_control"
 
 const SPEED:float = 5.0
-const JUMP_VELOCITY:float = 4.5
 
 enum PawnMovementStates{
 	IDLE,

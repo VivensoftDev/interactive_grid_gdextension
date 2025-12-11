@@ -121,7 +121,7 @@ func move_along_path(path: PackedInt64Array)-> void:
 	if not is_on_target_cell(_pawn.global_position, target_global_position, 0.20):
 		reaching_cell_target(target_cell_index, path)
 	else:
-		target_reached()
+		target_cell_reached()
 
 
 func reaching_cell_target(target_cell_index: int, path: PackedInt64Array) -> void:
@@ -133,7 +133,7 @@ func reaching_cell_target(target_cell_index: int, path: PackedInt64Array) -> voi
 			printerr("pawn does not have the 'move_to' method.")
 
 
-func target_reached():
+func target_cell_reached():
 	if not _path.is_empty():
 		_path.remove_at(0)
 
