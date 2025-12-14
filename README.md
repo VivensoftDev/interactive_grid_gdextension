@@ -3,7 +3,7 @@
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-AntoineCharruel-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/antoinecharruel)
 [![AntoineCharruel on Itch.io](https://img.shields.io/badge/Itch.io-AntoineCharruel-FF5E5B?logo=itch.io&logoColor=white)](https://antoine-charruel.itch.io/)
 [![Instagram](https://img.shields.io/badge/Instagram-VSFT%20GameDev-E4405F?logo=instagram&logoColor=white)](https://www.instagram.com/vsftgamedev/)
-[![Join the Discord](https://img.shields.io/static/v1?logo=discord&label=Discord&color=7289DA&message=Vivensoft)](https://discord.gg/G8N27Mm2)
+[![Join the Discord](https://img.shields.io/static/v1?logo=discord&label=Discord&color=7289DA&message=Vivensoft)](https://discord.gg/hZb9PGrrt9)
 [![YouTube](https://img.shields.io/static/v1?logo=youtube&label=YouTube&color=FF0000&message=antoinecharruel)](https://www.youtube.com/@antoinecharruel)
 
 # Interactive Grid GDExtension
@@ -305,7 +305,7 @@ For details on customizing shaders for the interactive 3D grid, see:
 If you encounter any issues, have questions, want to share your project using Interactive Grid, or give feedback, feel free to reach out on Discord:
 
 <div align="center">
-  <a href="https://discord.gg/G8N27Mm2">
+  <a href="https://discord.gg/hZb9PGrrt9">
     <img src="https://img.shields.io/static/v1?logo=discord&label=Discord&color=7289DA&message=Vivensoft" alt="Join the Discord">
   </a>
 </div>
