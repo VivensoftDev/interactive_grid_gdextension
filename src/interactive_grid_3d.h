@@ -94,7 +94,6 @@ private:
 		uint32_t flags = 0;
 
 		godot::Vector3 center_global_position = godot::Vector3(0.0f, 0.0f, 0.0f);
-		godot::Vector3 top_left_global_position = godot::Vector3(0.0f, 0.0f, 0.0f);
 
 		godot::Ref<godot::AStar2D> astar;
 
@@ -237,7 +236,6 @@ public:
 	godot::Vector3 get_cell_global_position(int p_cell_index) const;
 	int get_cell_index_from_global_position(godot::Vector3 p_global_position) const;
 	godot::Vector3 get_grid_center_global_position() const;
-	godot::Vector3 get_top_left_global_position() const;
 	void center(godot::Vector3 p_center_position);
 	void update_custom_data();
 

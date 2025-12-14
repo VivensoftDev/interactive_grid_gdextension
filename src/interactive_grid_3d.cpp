@@ -817,7 +817,6 @@ void InteractiveGrid3D::_bind_methods() {
 	godot::ClassDB::bind_method(godot::D_METHOD("get_cell_global_position", "cell_index"), &InteractiveGrid3D::get_cell_global_position);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_cell_index_from_global_position", "global_position"), &InteractiveGrid3D::get_cell_index_from_global_position);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_grid_center_global_position"), &InteractiveGrid3D::get_grid_center_global_position);
-	godot::ClassDB::bind_method(godot::D_METHOD("get_top_left_global_position"), &InteractiveGrid3D::get_top_left_global_position);
 
 	godot::ClassDB::bind_method(godot::D_METHOD("set_layout", "layout"), &InteractiveGrid3D::set_layout);
 	godot::ClassDB::bind_method(godot::D_METHOD("get_layout"), &InteractiveGrid3D::get_layout);
@@ -1345,10 +1344,6 @@ int InteractiveGrid3D::get_cell_index_from_global_position(godot::Vector3 p_glob
 
 godot::Vector3 InteractiveGrid3D::get_grid_center_global_position() const {
 	return data.center_global_position;
-}
-
-godot::Vector3 InteractiveGrid3D::get_top_left_global_position() const {
-	return data.top_left_global_position;
 }
 
 void InteractiveGrid3D::center(godot::Vector3 p_center_position) {
