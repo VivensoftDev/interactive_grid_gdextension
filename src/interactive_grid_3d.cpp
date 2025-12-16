@@ -171,7 +171,7 @@ void InteractiveGrid3D::_layout_cells_as_square_grid(godot::Vector3 p_center_pos
 			data.cells.write[index]->local_xform = data.multimesh->get_instance_transform(index);
 			data.cells.write[index]->global_xform = data.multimesh_instance->get_global_transform() * data.multimesh->get_instance_transform(index);
 
-			set_cell_visible(index, false);
+			set_cell_visible(index, true);
 		}
 	}
 
@@ -229,7 +229,7 @@ void InteractiveGrid3D::_layout_cells_as_hexagonal_grid(godot::Vector3 p_center_
 			data.cells.write[index]->local_xform = data.multimesh->get_instance_transform(index);
 			data.cells.write[index]->global_xform = data.multimesh_instance->get_global_transform() * data.multimesh->get_instance_transform(index);
 
-			set_cell_visible(index, false);
+			set_cell_visible(index, true);
 		}
 	}
 
@@ -443,6 +443,10 @@ void InteractiveGrid3D::_breadth_first_search(unsigned int p_start_cell_index) {
 
 void InteractiveGrid3D::_align_cells_with_floor() {
 	if (data.flags & GFL_CREATED) {
+		if (data.floor_collision_mask == 0) {
+			return;
+		}
+
 		auto start = std::chrono::high_resolution_clock::now();
 
 		const int ray_length = 500;
@@ -537,6 +541,10 @@ void InteractiveGrid3D::_scan_environnement_obstacles() {
 	}
 
 	if (!data.cell_shape.is_valid()) {
+		return;
+	}
+
+	if (data.obstacles_collision_masks == 0) {
 		return;
 	}
 
