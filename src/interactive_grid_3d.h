@@ -49,9 +49,7 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/templates/vector.hpp>
 
-#include <algorithm>
 #include <chrono>
-#include <queue>
 
 class InteractiveGrid3D : public godot::Node3D {
 	GDCLASS(InteractiveGrid3D, Node3D);

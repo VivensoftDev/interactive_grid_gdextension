@@ -401,26 +401,26 @@ void InteractiveGrid3D::_breadth_first_search(unsigned int p_start_cell_index) {
 		graph.write[index].neighbors = get_neighbors(index);
 	}
 
-	std::queue<int> q;
+	godot::List<int> queue;
 
 	graph.write[p_start_cell_index].visited = true;
-	q.push(p_start_cell_index);
+	queue.push_back(p_start_cell_index);
 
-	while (!q.empty()) {
-		int current = q.front();
-		q.pop();
+	while (!queue.is_empty()) {
+		int current = queue.front()->get();
+		queue.pop_front();
 
 		if (!graph[current].is_walkable) {
 			continue;
 		}
 
-		for (int neighbor : graph[current].neighbors) {
+		for (const int &neighbor : graph[current].neighbors) {
 			if (!graph[neighbor].is_walkable) {
 				continue;
 			}
 
 			if (!graph[neighbor].visited) {
-				q.push(neighbor);
+				queue.push_back(neighbor);
 				graph.write[neighbor].visited = true;
 			}
 		}
@@ -441,7 +441,6 @@ void InteractiveGrid3D::_align_cells_with_floor() {
 		auto start = std::chrono::high_resolution_clock::now();
 
 		const int ray_length = 500;
-
 		const godot::Transform3D global_transform = data.multimesh_instance->get_global_transform();
 		const godot::Transform3D global_to_local = global_transform.affine_inverse();
 
@@ -452,9 +451,7 @@ void InteractiveGrid3D::_align_cells_with_floor() {
 
 				godot::Vector3 local_from = data.cells[index]->local_xform.origin;
 				godot::Vector3 global_from = data.cells[index]->global_xform.origin;
-
 				global_from.y += 100.0f;
-
 				godot::Vector3 global_to = global_from - godot::Vector3(0, ray_length, 0);
 
 				godot::Ref<godot::World3D> world = get_world_3d();
@@ -505,6 +502,7 @@ void InteractiveGrid3D::_align_cells_with_floor() {
 
 				} else if (!godot::Engine::get_singleton()->is_editor_hint()) {
 					_set_cell_in_void(index, true);
+					set_cell_walkable(index, false);
 				} else {
 					set_cell_walkable(index, true);
 					set_cell_reachable(index, true);
@@ -1576,6 +1574,7 @@ void InteractiveGrid3D::InteractiveGrid3D::reset_cells_state() {
 			const int index = row * data.columns + column;
 			clear_all_custom_cell_data(index);
 			data.cells.write[index]->flags = 0;
+			set_cell_walkable(index, true);
 		}
 	}
 
