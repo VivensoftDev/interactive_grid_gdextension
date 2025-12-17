@@ -21,7 +21,7 @@
 			<param index="0" name="cell_index" type="int" />
 			<param index="1" name="custom_data_name" type="String" />
 			<description>
-			Adds custom data to a specific cell.
+				Adds custom data to a specific cell.
 			- Applies the associated layer mask to the cell.
 			- If a custom color is defined, it is applied to the cell.
 			</description>
@@ -38,7 +38,7 @@
 			<return type="void" />
 			<param index="0" name="cell_index" type="int" />
 			<description>
-			Resets the cell's custom_flags and removes any custom_color.
+				Resets the cell's custom_flags and removes any custom_color.
 			</description>
 		</method>
 		<method name="clear_custom_cell_data">
@@ -47,14 +47,14 @@
 			<param index="1" name="custom_data_name" type="String" />
 			<param index="2" name="clear_custom_color" type="bool" />
 			<description>
-			Resets the custom data of a given cell.
+				Resets the custom data of a given cell.
 			</description>
 		</method>
 		<method name="compute_unreachable_cells">
 			<return type="void" />
 			<param index="0" name="start_cell_index" type="int" />
 			<description>
-			Iterates over all grid cells and marks as unreachable those cells that cannot be reached from the specified start_cell.
+				Iterates over all grid cells and marks as unreachable those cells that cannot be reached from the specified start_cell.
 			Updates the visual representation by applying unreachable_color to the cells.
 			</description>
 		</method>
@@ -108,7 +108,7 @@
 		<method name="get_size" qualifiers="const">
 			<return type="int" />
 			<description>
-			Returns the total number of cells in the grid.
+				Returns the total number of cells in the grid.
 			</description>
 		</method>
 		<method name="has_custom_cell_data">
@@ -116,7 +116,7 @@
 			<param index="0" name="cell_index" type="int" />
 			<param index="1" name="custom_data_name" type="String" />
 			<description>
-			Checks if a specific cell has the given CustomCellData applied. Returns true if the cell's flags include the full layer mask of the specified CustomCellData, otherwise returns false.
+				Checks if a specific cell has the given CustomCellData applied. Returns true if the cell's flags include the full layer mask of the specified CustomCellData, otherwise returns false.
 			</description>
 		</method>
 		<method name="hide_distant_cells">
@@ -139,6 +139,13 @@
 			<param index="0" name="path" type="PackedInt64Array" />
 			<description>
 				Updates the hover highlight state based on the specified global_position. Identifies the corresponding cell, clears any previous hover, and applies the hover color unless the cell is already selected.
+			</description>
+		</method>
+		<method name="is_cell_accessible" qualifiers="const">
+			<return type="bool" />
+			<param index="0" name="cell_index" type="int" />
+			<description>
+			Returns true if the cell at the specified index is currently marked as accessible.
 			</description>
 		</method>
 		<method name="is_cell_hovered" qualifiers="const">
@@ -169,13 +176,6 @@
 				Returns true if the cell at the specified index is currently marked as visible.
 			</description>
 		</method>
-		<method name="is_cell_walkable" qualifiers="const">
-			<return type="bool" />
-			<param index="0" name="cell_index" type="int" />
-			<description>
-				Returns true if the cell at the specified index is currently marked as walkable.
-			</description>
-		</method>
 		<method name="is_grid_created" qualifiers="const">
 			<return type="bool" />
 			<description>
@@ -201,6 +201,14 @@
 				Selects a grid cell based on a global_position.
 			</description>
 		</method>
+		<method name="set_cell_accessible">
+			<return type="void" />
+			<param index="0" name="cell_index" type="int" />
+			<param index="1" name="is_accessible" type="bool" />
+			<description>
+			Sets whether a specific cell is accessible or not.
+			</description>
+		</method>
 		<method name="set_cell_color">
 			<return type="void" />
 			<param index="0" name="cell_index" type="int" />
@@ -217,14 +225,6 @@
 				Sets whether a given grid cell is unreachable.
 			</description>
 		</method>
-		<method name="set_cell_walkable">
-			<return type="void" />
-			<param index="0" name="cell_index" type="int" />
-			<param index="1" name="is_walkable" type="bool" />
-			<description>
-				Sets whether a specific cell is walkable or not.
-			</description>
-		</method>
 		<method name="set_hover_enabled">
 			<return type="void" />
 			<param index="0" name="enabled" type="bool" />
@@ -235,11 +235,13 @@
 		<method name="update_custom_data">
 			<return type="void" />
 			<description>
-			Refreshes custom_cell_flags, colors, and A* configuration based on the current CellCustomData.
+				Refreshes custom_cell_flags, colors, and A* configuration based on the current CellCustomData.
 			</description>
 		</method>
 	</methods>
 	<members>
+		<member name="accessible_color" type="Color" setter="set_accessible_color" getter="get_accessible_color" default="Color(0.5, 0.65, 1, 1)">
+		</member>
 		<member name="cell_mesh" type="Mesh" setter="set_cell_mesh" getter="get_cell_mesh">
 		</member>
 		<member name="cell_shape" type="Shape3D" setter="set_cell_shape" getter="get_cell_shape">
@@ -274,11 +276,9 @@
 		</member>
 		<member name="selected_color" type="Color" setter="set_selected_color" getter="get_selected_color" default="Color(0.8784314, 1, 1, 1)">
 		</member>
+		<member name="unaccessible_color" type="Color" setter="set_unaccessible_color" getter="get_unaccessible_color" default="Color(0.8039216, 0.36078432, 0.36078432, 1)">
+		</member>
 		<member name="unreachable_color" type="Color" setter="set_unreachable_color" getter="get_unreachable_color" default="Color(1, 1, 1, 1)">
-		</member>
-		<member name="unwalkable_color" type="Color" setter="set_unwalkable_color" getter="get_unwalkable_color" default="Color(0.8039216, 0.36078432, 0.36078432, 1)">
-		</member>
-		<member name="walkable_color" type="Color" setter="set_walkable_color" getter="get_walkable_color" default="Color(0.5, 0.65, 1, 1)">
 		</member>
 	</members>
 	<constants>
