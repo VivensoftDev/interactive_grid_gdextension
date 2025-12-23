@@ -1,4 +1,4 @@
-[![Interactive Grid GDExtension Godot Asset Library page](https://img.shields.io/static/v1?logo=godotengine&label=Interactive%20Grid%20GDExtension&color=478CBF&message=1.8.0)](https://godotengine.org/asset-library/asset/4372)
+[![Interactive Grid GDExtension Godot Asset Library page](https://img.shields.io/static/v1?logo=godotengine&label=Interactive%20Grid%20GDExtension&color=478CBF&message=1.9.0)](https://godotengine.org/asset-library/asset/4372)
 [![Patreon](https://img.shields.io/badge/Patreon-Vivensoft-F96854?logo=patreon&logoColor=white)](https://www.patreon.com/c/vivensoft/)  
 [![Ko-fi](https://img.shields.io/badge/Ko--fi-AntoineCharruel-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/antoinecharruel)
 [![AntoineCharruel on Itch.io](https://img.shields.io/badge/Itch.io-AntoineCharruel-FF5E5B?logo=itch.io&logoColor=white)](https://antoine-charruel.itch.io/)
@@ -107,7 +107,7 @@ func show_grid():
    var pawn_current_cell_index: int = self.get_cell_index_from_global_position(_pawn.global_position)
 
    # To prevent the player from getting stuck.
-   self.set_cell_walkable(pawn_current_cell_index, true)
+   self.set_cell_accessible(pawn_current_cell_index, true)
    self.set_cell_reachable(pawn_current_cell_index, true)
 
    self.hide_distant_cells(pawn_current_cell_index, 6)
@@ -147,7 +147,7 @@ func _input(event):
 			return
 
 		 var pawn_current_cell_index: int = self.get_cell_index_from_global_position(self.get_grid_center_global_position())
-		 self.set_cell_walkable(pawn_current_cell_index, true)
+		 self.set_cell_accessible(pawn_current_cell_index, true)
 		 _path = self.get_path(pawn_current_cell_index, selected_cells[0])
 		 print("Last selected cell:", self.get_latest_selected())
 		 print("Path:", _path)
@@ -205,7 +205,7 @@ varying vec4 instance_c_default;
 varying float alpha;
 
 // Default cell flags:
-const int CFL_WALKABLE = 1 << 0;
+const int CFL_ACCESSIBLE = 1 << 0;
 const int CFL_REACHABLE = 1 << 1;
 const int CFL_IN_VOID = 1 << 2;
 const int CFL_HOVERED = 1 << 3;
@@ -230,7 +230,7 @@ void vertex() {
    int cell_flag = int(instance_c.a);
    alpha = 0.5;
 
-   if ((cell_flag & CFL_WALKABLE) == 0) {
+   if ((cell_flag & CFL_ACCESSIBLE) == 0) {
       alpha = 0.20;
    }
 
@@ -238,7 +238,7 @@ void vertex() {
       && (cell_flag & CFL_PATH) == 0
       && (cell_flag & CFL_TRAP) == 0)
       {
-         if ((cell_flag & CFL_WALKABLE) != 0) {
+         if ((cell_flag & CFL_ACCESSIBLE) != 0) {
             alpha = 0.40;
             instance_c.r = 0.2;
             instance_c.g = 0.5;
