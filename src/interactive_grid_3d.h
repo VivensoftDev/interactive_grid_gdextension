@@ -237,7 +237,7 @@ public:
 
 	godot::Vector3 get_cell_global_position(int p_cell_index) const;
 	int get_cell_index_from_global_position(godot::Vector3 p_global_position) const;
-	godot::Vector3 get_grid_center_global_position() const;
+	godot::Vector3 get_center_global_position() const;
 	void center(godot::Vector3 p_center_position);
 	void update_custom_data();
 
