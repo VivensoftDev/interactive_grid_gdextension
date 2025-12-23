@@ -79,7 +79,6 @@ cell_size = Vector2(2, 1.732)
 cell_mesh = SubResource("CylinderMesh_788fa")
 cell_shape = SubResource("CylinderShape3D_8u2o4")
 cell_shape_offset = Vector3(0, 3, 0)
-walkable_color = Color(0.5019608, 0.6509804, 1, 0.3137255)
 custom_cells_data = [SubResource("CustomCellData_8u2o4"), SubResource("CustomCellData_2008n"), SubResource("CustomCellData_7d7wc"), SubResource("CustomCellData_k2v5m")]
 material_override = SubResource("ShaderMaterial_8u2o4")
 layout = 1

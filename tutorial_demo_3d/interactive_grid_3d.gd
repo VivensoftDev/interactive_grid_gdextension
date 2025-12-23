@@ -6,17 +6,19 @@ extends InteractiveGrid3D
 
 var _path: PackedInt64Array = []
 var _pawn: CharacterBody3D = null
+var _show_grid: bool = false
 
 @onready var debug_collision_shape_area_3d: CollisionShape3D = $"../DebugCollisionShapeArea3D/DebugCollisionShapeArea3D"
 
 func _ready() -> void:
-	pass
+	_show_grid = false
 
 
 func _process(delta: float) -> void:
-	if _pawn == null: 
-		return
-
+	
+	if _show_grid == false and self.visible:
+		self.set_visible(false)
+		
 	if self.get_selected_cells().is_empty():
 		self.highlight_on_hover(ray_cast_from_mouse.get_ray_intersection_position())
 	else:
@@ -37,7 +39,11 @@ func show_grid():
 	if _pawn == null:
 		return
 
+	if not self.is_grid_created():
+		return
+				
 	print("show_grid")
+	_show_grid = true
 
 	_path = []
 	self.set_visible(true)
@@ -46,7 +52,7 @@ func show_grid():
 	var pawn_current_cell_index: int = self.get_cell_index_from_global_position(_pawn.global_position)
 
 	# To prevent the player from getting stuck.
-	self.set_cell_walkable(pawn_current_cell_index, true)
+	self.set_cell_accessible(pawn_current_cell_index, true)
 	self.set_cell_reachable(pawn_current_cell_index, true)
 
 	self.hide_distant_cells(pawn_current_cell_index, 6)
@@ -86,7 +92,7 @@ func _input(event):
 				return
 
 			var pawn_current_cell_index: int = self.get_cell_index_from_global_position(self.get_grid_center_global_position())
-			self.set_cell_walkable(pawn_current_cell_index, true)
+			self.set_cell_accessible(pawn_current_cell_index, true)
 			_path = self.get_path(pawn_current_cell_index, selected_cells[0])
 			print("Last selected cell:", self.get_latest_selected())
 			print("Path:", _path)
