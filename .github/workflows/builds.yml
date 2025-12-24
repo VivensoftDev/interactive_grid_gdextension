@@ -1,14 +1,10 @@
-name: Build GDExtension
-on:
-  workflow_call:
-  push:
-    branches:
-      - build
-  pull_request:
-    branches:
-      - build
-  merge_group:
+# For syntax, see https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax
+# This workflow is triggered manually on the "Actions" tab on GitHub, and can be used to create releases.
 
+name: Make a GDExtension build for all supported platforms
+on:
+  workflow_dispatch:
+    
 permissions:
   contents: write
 
