@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="InteractiveGrid3D" inherits="Node3D" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
 	<brief_description>
-		InteractiveGrid3D is a Node3D that allows player interaction with a 3D grid. It can be used for cell selection, pathfinding, and hover highlights.
+		InteractiveGrid is a Godot GDExtension that allows player interaction with a 3D grid, including cell selection, pathfinding, and hover highlights.
 	</brief_description>
 	<description>
 		- Select individual cells.
@@ -14,6 +14,7 @@
 		- High performance using MultiMeshInstance3D for efficient rendering of multiple cells.
 	</description>
 	<tutorials>
+		<link title="Tutorial - InteractiveGrid3D">https://antoinecharruel.github.io/godot-gdextension-docs/interactive-grid/tutorial-interactive-grid-3d.html#tutorial-interactivegrid3d</link>
 	</tutorials>
 	<methods>
 		<method name="add_custom_cell_data">
@@ -22,8 +23,8 @@
 			<param index="1" name="custom_data_name" type="String" />
 			<description>
 				Adds custom data to a specific cell.
-			- Applies the associated layer mask to the cell.
-			- If a custom color is defined, it is applied to the cell.
+				- Applies the associated layer mask to the cell.
+				- If a custom color is defined, it is applied to the cell.
 			</description>
 		</method>
 		<method name="center">
@@ -55,7 +56,7 @@
 			<param index="0" name="start_cell_index" type="int" />
 			<description>
 				Iterates over all grid cells and marks as unreachable those cells that cannot be reached from the specified start_cell.
-			Updates the visual representation by applying unreachable_color to the cells.
+				Updates the visual representation by applying unreachable_color to the cells.
 			</description>
 		</method>
 		<method name="get_cell_global_position" qualifiers="const">
@@ -72,7 +73,7 @@
 				Returns the index of the grid cell that is closest to the supplied world position.
 			</description>
 		</method>
-		<method name="get_grid_center_global_position" qualifiers="const">
+		<method name="get_center_global_position" qualifiers="const">
 			<return type="Vector3" />
 			<description>
 				Returns the global_position of the interactive grid.
@@ -145,7 +146,7 @@
 			<return type="bool" />
 			<param index="0" name="cell_index" type="int" />
 			<description>
-			Returns true if the cell at the specified index is currently marked as accessible.
+				Returns true if the cell at the specified index is currently marked as accessible.
 			</description>
 		</method>
 		<method name="is_cell_hovered" qualifiers="const">
@@ -206,7 +207,7 @@
 			<param index="0" name="cell_index" type="int" />
 			<param index="1" name="is_accessible" type="bool" />
 			<description>
-			Sets whether a specific cell is accessible or not.
+				Sets whether a specific cell is accessible or not.
 			</description>
 		</method>
 		<method name="set_cell_color">
@@ -241,44 +242,67 @@
 	</methods>
 	<members>
 		<member name="accessible_color" type="Color" setter="set_accessible_color" getter="get_accessible_color" default="Color(0.5, 0.65, 1, 1)">
+			Color used to indicate that the cell is accessible.
 		</member>
 		<member name="cell_mesh" type="Mesh" setter="set_cell_mesh" getter="get_cell_mesh">
+			The [Mesh] resource for the grid.
+		</member>
+		<member name="cell_rotation" type="Vector3" setter="set_cell_rotation" getter="get_cell_rotation" default="Vector3(0, 0, 0)">
+			Rotation of the cell in 3D space.
 		</member>
 		<member name="cell_shape" type="Shape3D" setter="set_cell_shape" getter="get_cell_shape">
+			The [Shape3D] resource for the cell, used for obstacle detection and for detecting objects that have a collision shape on the same layer as a CustomCellData.
 		</member>
 		<member name="cell_shape_offset" type="Vector3" setter="set_cell_shape_offset" getter="get_cell_shape_offset" default="Vector3(0, 0, 0)">
+			Offset of the cell shape relative to the cell origin.
 		</member>
 		<member name="cell_size" type="Vector2" setter="set_cell_size" getter="get_cell_size" default="Vector2(1, 1)">
+			Size of each grid cell.
 		</member>
 		<member name="columns" type="int" setter="set_columns" getter="get_columns" default="9">
+			Number of columns in the grid.
 		</member>
 		<member name="custom_cells_data" type="Array" setter="set_custom_cells_data" getter="get_custom_cells_data" default="[]">
+			List of CustomCellData used to add additional states, behaviors, or visual effects to specific grid cells. Each CustomCellData can be applied via a collision mask or through GDScript, and is accessible in shader scripts via the INSTANCE_CUSTOM alpha channel.
 		</member>
-		<member name="floor_collision_masks" type="int" setter="set_grid_floor_collision_masks" getter="get_grid_floor_collision_masks" default="16384">
+		<member name="floor_collision_masks" type="int" setter="set_floor_collision_masks" getter="get_floor_collision_masks" default="16384">
+			Collision masks used to detect the floor.
 		</member>
 		<member name="hovered_color" type="Color" setter="set_hovered_color" getter="get_hovered_color" default="Color(1, 0.84313726, 0, 1)">
+			Color used when the cell is hovered over.
 		</member>
 		<member name="layout" type="int" setter="set_layout" getter="get_layout" enum="InteractiveGrid3D.Layout" default="0">
+			Grid layout type (LAYOUT_SQUARE, LAYOUT_HEXAGONAL).
 		</member>
 		<member name="material_override" type="Material" setter="set_material_override" getter="get_material_override">
+			Optional material override for the grid. Assign a custom [ShaderMaterial] to visually modify grid cells.
 		</member>
 		<member name="movement" type="int" setter="set_movement" getter="get_movement" enum="InteractiveGrid3D.Movement" default="0">
+			Type of movement on the grid for pathfinding: 4, 6, or 8 directions.
 		</member>
 		<member name="obstacles_collision_masks" type="int" setter="set_obstacles_collision_masks" getter="get_obstacles_collision_masks" default="8192">
+			Collision masks used to detect obstacles on the grid.
 		</member>
 		<member name="path_color" type="Color" setter="set_path_color" getter="get_path_color" default="Color(0.5647059, 0.93333334, 0.5647059, 1)">
+			Color used to display the path.
 		</member>
 		<member name="print_execution_time_enabled" type="bool" setter="set_print_execution_time_enabled" getter="is_print_execution_time_enabled" default="false">
+			Enable printing execution time of grid operations for debugging.
 		</member>
 		<member name="print_logs_enabled" type="bool" setter="set_print_logs_enabled" getter="is_print_logs_enabled" default="false">
+			Enable printing debug logs related to grid operations.
 		</member>
 		<member name="rows" type="int" setter="set_rows" getter="get_rows" default="9">
+			Number of rows in the grid.
 		</member>
 		<member name="selected_color" type="Color" setter="set_selected_color" getter="get_selected_color" default="Color(0.8784314, 1, 1, 1)">
+			Color used to indicate the currently selected cell.
 		</member>
 		<member name="unaccessible_color" type="Color" setter="set_unaccessible_color" getter="get_unaccessible_color" default="Color(0.8039216, 0.36078432, 0.36078432, 1)">
+			Color used to indicate that the cell is not accessible or blocked.
 		</member>
 		<member name="unreachable_color" type="Color" setter="set_unreachable_color" getter="get_unreachable_color" default="Color(1, 1, 1, 1)">
+			Color used to indicate that the cell is not reachable.
 		</member>
 	</members>
 	<constants>
