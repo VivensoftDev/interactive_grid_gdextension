@@ -55,7 +55,7 @@ InteractiveGrid is a Godot GDExtension that allows player interaction with a 3D 
 
 [![](/docs/preview/online_documentation_preview.png)](https://antoinecharruel.github.io/godot-gdextension-docs/interactive-grid/interactive-grid-3d.html)
 
-[![InteractiveGrid GDExtension Documentation](https://img.shields.io/static/v1?logo=godotengine&label=Interactive%20Grid%20GDExtension%20Online%20Documentation&color=478CBF&message=1.8.0)](https://antoinecharruel.github.io/godot-gdextension-docs/interactive-grid/interactive-grid-3d.html)
+[![InteractiveGrid GDExtension](https://img.shields.io/static/v1?logo=godotengine&label=Interactive%20Grid%20GDExtension&color=478CBF&message=Online%20Documentation)](https://antoinecharruel.github.io/godot-gdextension-docs/interactive-grid/interactive-grid-3d.html)
 
 ## Demo GDScript Example
 
