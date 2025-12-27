@@ -2,22 +2,21 @@
 *.gen.*
 .godot/
 
-# Keep bin and their binaries
-!bin/
-!bin/**/*.gdextension
-!bin/**/*.so
-!bin/**/*.dll
-!bin/**/*.dylib
-!bin/**/*.gitkeep
-
-!demo/bin/
-!demo/bin/**/*.gdextension
-!demo/bin/**/*.so
-!demo/bin/**/*.dll
-!demo/bin/**/*.dylib
-!demo/bin/**/*.gitkeep
-
-# Ignore SCons database
+# Ignore library files but not the gdextension file
+demo/bin/*
+!demo/bin/android
+demo/bin/android/*
+!demo/bin/android/.gitkeep
+!demo/bin/linux
+demo/bin/linux/*
+!demo/bin/linux/.gitkeep
+!demo/bin/macos
+demo/bin/macos/*
+!demo/bin/macos/.gitkeep
+!demo/bin/windows
+demo/bin/windows/*
+!demo/bin/windows/.gitkeep
+!demo/bin/*.gdextension
 .sconsign*.dblite
 
 # Ignore custom.py
@@ -32,6 +31,7 @@ compile_commands.json
 # Binaries
 *.o
 *.os
+*.so
 *.obj
 *.bc
 *.pyc
