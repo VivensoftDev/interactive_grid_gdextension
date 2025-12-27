@@ -297,8 +297,7 @@ For details on customizing shaders for the interactive 3D grid, see:
 
 ## TODO
 
-- [x] Allow the user to choose custom cell flags: [Add Custom Shader](tutorial-interactive-grid-3d.html#add-custom-shader)
-.
+- [x] Allow the user to choose custom cell flags: [Add Custom Shader](https://antoinecharruel.github.io/godot-gdextension-docs/interactive-grid/tutorial-interactive-grid-3d.html#add-custom-shader)
 - [ ] Create InteractiveGrid2D.
 
 ## Need Help, Found an Issue, or Want to Share Your Work? 🛠️🎨
