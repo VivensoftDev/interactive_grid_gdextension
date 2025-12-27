@@ -120,7 +120,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: interactive-grid
-          path: addons/
+          path: addons/interactive-grid/
 
       #  Deploy the merged build.
       - name: Deploy all builds to GitHub Pages
