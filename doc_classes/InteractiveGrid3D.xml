@@ -66,11 +66,25 @@
 				Returns the global_position of the cell identified by index.
 			</description>
 		</method>
+		<method name="get_cell_global_transform" qualifiers="const">
+			<return type="Transform3D" />
+			<param index="0" name="cell_index" type="int" />
+			<description>
+			Returns the global [Transform3D] of the specified cell.
+			</description>
+		</method>
 		<method name="get_cell_index_from_global_position" qualifiers="const">
 			<return type="int" />
 			<param index="0" name="global_position" type="Vector3" />
 			<description>
 				Returns the index of the grid cell that is closest to the supplied world position.
+			</description>
+		</method>
+		<method name="get_cell_transform" qualifiers="const">
+			<return type="Transform3D" />
+			<param index="0" name="cell_index" type="int" />
+			<description>
+			Returns the local [Transform3D] of the specified cell.
 			</description>
 		</method>
 		<method name="get_center_global_position" qualifiers="const">
@@ -268,7 +282,7 @@
 		<member name="floor_collision_masks" type="int" setter="set_floor_collision_masks" getter="get_floor_collision_masks" default="16384">
 			Collision masks used to detect the floor.
 		</member>
-		<member name="hovered_color" type="Color" setter="set_hovered_color" getter="get_hovered_color" default="Color(1, 0.84313726, 0, 1)">
+		<member name="hovered_color" type="Color" setter="set_hovered_color" getter="get_hovered_color" default="Color(1, 0.843137, 0, 1)">
 			Color used when the cell is hovered over.
 		</member>
 		<member name="layout" type="int" setter="set_layout" getter="get_layout" enum="InteractiveGrid3D.Layout" default="0">
@@ -283,7 +297,7 @@
 		<member name="obstacles_collision_masks" type="int" setter="set_obstacles_collision_masks" getter="get_obstacles_collision_masks" default="8192">
 			Collision masks used to detect obstacles on the grid.
 		</member>
-		<member name="path_color" type="Color" setter="set_path_color" getter="get_path_color" default="Color(0.5647059, 0.93333334, 0.5647059, 1)">
+		<member name="path_color" type="Color" setter="set_path_color" getter="get_path_color" default="Color(0.564706, 0.933333, 0.564706, 1)">
 			Color used to display the path.
 		</member>
 		<member name="print_execution_time_enabled" type="bool" setter="set_print_execution_time_enabled" getter="is_print_execution_time_enabled" default="false">
@@ -295,10 +309,10 @@
 		<member name="rows" type="int" setter="set_rows" getter="get_rows" default="9">
 			Number of rows in the grid.
 		</member>
-		<member name="selected_color" type="Color" setter="set_selected_color" getter="get_selected_color" default="Color(0.8784314, 1, 1, 1)">
+		<member name="selected_color" type="Color" setter="set_selected_color" getter="get_selected_color" default="Color(0.878431, 1, 1, 1)">
 			Color used to indicate the currently selected cell.
 		</member>
-		<member name="unaccessible_color" type="Color" setter="set_unaccessible_color" getter="get_unaccessible_color" default="Color(0.8039216, 0.36078432, 0.36078432, 1)">
+		<member name="unaccessible_color" type="Color" setter="set_unaccessible_color" getter="get_unaccessible_color" default="Color(0.803922, 0.360784, 0.360784, 1)">
 			Color used to indicate that the cell is not accessible or blocked.
 		</member>
 		<member name="unreachable_color" type="Color" setter="set_unreachable_color" getter="get_unreachable_color" default="Color(1, 1, 1, 1)">
