@@ -4,9 +4,6 @@
 name: Make a GDExtension build for all supported platforms
 on:
   workflow_dispatch:
-    
-permissions:
-  contents: write
 
 jobs:
   build:
@@ -14,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         # A build is made for every possible combination of parameters
-        # You can add or remove entries from the arrays of each parameter to customize which builds you want to run
+        # You can add or remove entries from the arrays of each parameter to customize which builds you want to run.
         # See https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/running-variations-of-jobs-in-a-workflow
         target:
           [
@@ -34,7 +31,7 @@ jobs:
             { platform: web, arch: wasm32, os: ubuntu-22.04 },
           ]
         target-type: [template_debug, template_release]
-        float-precision: [single, double]
+        float-precision: [single]
 
     runs-on: ${{ matrix.target.os }}
     steps:
@@ -43,16 +40,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-
-      # Lint
-      #- name: Setup clang-format
-      #  shell: bash
-      #  run: |
-      #    python -m pip install clang-format
-      #- name: Run clang-format
-      #  shell: bash
-      #  run: |
-      #    clang-format src/** --dry-run --Werror
 
       # Add linux x86_32 toolchain
       - name: Install multilib support
@@ -101,35 +88,17 @@ jobs:
         with:
           name: interactive-grid-${{ matrix.target.platform }}-${{ matrix.target.arch }}-${{ matrix.float-precision }}-${{ matrix.target-type }}
           path: |
-            ${{ github.workspace }}/bin/interactive-grid/**
+            ${{ github.workspace }}/bin/**
 
+  # Merges all the build artifacts together into a single interactive-grid artifact.
+  # If you comment out this step, all the builds will be uploaded individually.
   merge:
     runs-on: ubuntu-22.04
     needs: build
     steps:
-      # Merge all build artifacts into a single artifact named "interactive-grid".
       - name: Merge Artifacts
         uses: actions/upload-artifact/merge@v4
         with:
           name: interactive-grid
           pattern: interactive-grid-*
           delete-merged: true
-
-      # Download the merged artifact.
-      - name: Download merged artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: interactive-grid
-          path: bin/interactive-grid/
-
-      #  Deploy the merged build.
-      - name: Deploy all builds to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-          publish_branch: godot-asset-lib
-          enable_jekyll: true
-          force_orphan: true
-          keep_files: false
-          commit_message: "Deploy all interactive-grid builds"
