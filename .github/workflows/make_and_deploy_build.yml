@@ -120,6 +120,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./
+          force_orphan: true
           publish_branch: godot-asset-lib
           enable_jekyll: true
           keep_files: false
