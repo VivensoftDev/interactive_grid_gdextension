@@ -76,6 +76,7 @@ func show_grid():
 	#endregion
 	self.update_custom_data()
 
+
 func _input(event):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if _pawn == null:
